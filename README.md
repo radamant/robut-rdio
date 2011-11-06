@@ -37,6 +37,29 @@ hipchat>
 You can now point a web browser to the url that Rack gives you to run the client as well while you test the chat input.
 
 
+Then you can do the following while your web browser responds to the changes:
+
+```shell
+hipchat> @dj find guero
+Searching for: guero...
+0: Beck - Guero
+1: Beck - Guero - E-Pro
+2: Beck - Guero - Girl
+3: Beck - Guero - Que' Onda Guero
+4: Beck - Guero - Black Tambourine
+5: Beck - Guero - Missing
+6: Beck - Guero - Hell Yes
+7: Beck - Guero - Earthquake Weather
+8: Beck - Guero - Go It Alone
+9: Beck - Guero - Broken Drum
+hipchat> @dj play 6
+Queuing: Beck - Hell Yes
+hipchat>     
+```
+
+Now, the browser should have a song queued up and playing.
+
+
 Contributing to robut-rdio
 ----------------
  
