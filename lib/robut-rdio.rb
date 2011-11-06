@@ -1,3 +1,4 @@
+require 'robut'
 require 'server/server'
 require 'rdio'
 
