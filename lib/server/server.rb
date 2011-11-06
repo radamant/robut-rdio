@@ -1,3 +1,4 @@
+require 'robut'
 require 'sinatra'
 require 'json'
 
@@ -63,6 +64,9 @@ END
       self.class.command = []
       command.to_json
     end
+
+    # start the server if ruby file executed directly
+    run! if app_file == $0
   end
 end
 
