@@ -47,3 +47,8 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+
+desc 'Run plugin in a simulated Robut environment'
+task :shell do
+  load 'plugin-tester.rb'
+end
