@@ -66,7 +66,6 @@ class Robut::Plugin::Rdio
     words = words(message)
     
     if sent_to_me?(message)
-      puts message.inspect
       if words.join(' ') =~ /^(play)?\s?(result)?\s?\d/
         play_result(words.last.to_i)
       elsif words.first == 'play' and words.length > 1
