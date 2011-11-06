@@ -1,5 +1,5 @@
 require 'robut'
-require 'server/server'
+require_relative 'server/server'
 require 'rdio'
 
 # A plugin that hooks into Rdio, allowing you to queue songs from
