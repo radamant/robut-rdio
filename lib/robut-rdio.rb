@@ -1,5 +1,5 @@
+require 'server/server'
 require 'rdio'
-require 'robut/plugin/rdio/server'
 
 # A plugin that hooks into Rdio, allowing you to queue songs from
 # HipChat. +key+ and +secret+ must be set before we can deal with any
