@@ -10,4 +10,6 @@ group :development do
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.6.4"
   gem "rcov", ">= 0"
+  gem 'rdio', '0.0.91' # .92 is horked
+  gem 'sinatra'
 end
