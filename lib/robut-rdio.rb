@@ -85,6 +85,10 @@ class Robut::Plugin::Rdio
     end
   end
 
+  def results
+    @@results
+  end
+
   private
   RESULT_DISPLAYER = {
     ::Rdio::Album => lambda{|album| "#{album.artist.name} - #{album.name}"},
@@ -95,12 +99,14 @@ class Robut::Plugin::Rdio
     reply("Searching for: #{query[1..-1].join(' ')}...")
     @@results = search(query)
 
-    result_display = ""
-    @@results.each_with_index do |result, index|
+    result_display = format_results(@@results)
+    reply(result_display)
+  end
+
+  def format_results(results)
+    results.each_with_index do |result, index|
       result_display += format_result(result, index) + "\n"
     end
-
-    reply(result_display)
   end
 
   def play_result(number)
@@ -121,6 +127,7 @@ class Robut::Plugin::Rdio
     name = "#{result.artist_name} - #{name}" if result.respond_to?(:artist_name) && result.artist_name
     reply("Queuing: #{name}")
   end
+
 
   def format_result(search_result, index)
     response = RESULT_DISPLAYER[search_result.class].call(search_result)
