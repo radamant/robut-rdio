@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "robut-rdio"
-  s.version = "0.0.0"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Adam Pearson"]
@@ -43,6 +43,7 @@ Gem::Specification.new do |s|
     "lib/server/server.rb",
     "lib/tasks/shell.rake",
     "plugin-tester.rb",
+    "robut-rdio.gemspec",
     "spec/robut-rdio_spec.rb",
     "spec/spec_helper.rb"
   ]
