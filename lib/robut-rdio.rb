@@ -79,7 +79,7 @@ class Robut::Plugin::Rdio
       elsif words.join(' ') =~ /(find|do you have(\sany)?)\s?(.+[^?])\??/ 
         find(['',Regexp.last_match[-1]])
       else words.first =~ /play|(?:un)?pause|next|restart|back|clear/
-        Server.command << words.first
+        run_command(words.first)
       end
       
     end
@@ -94,6 +94,10 @@ class Robut::Plugin::Rdio
     ::Rdio::Album => lambda{|album| "#{album.artist.name} - #{album.name}"},
     ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"}
   }
+
+  def run_command(command)
+    Server.command << command
+  end
 
   def find(query)
     reply("Searching for: #{query[1..-1].join(' ')}...")

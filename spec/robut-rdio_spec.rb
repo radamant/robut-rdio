@@ -79,4 +79,17 @@ describe "RobutRdio Super Integration Test" do
     end
   end
 
+  describe 'running commands' do
+    before do
+      plugin.stub(:run_command){|command| @command = command}
+    end
+
+    %w{play unpause pause next restart back clear}.each do |command|
+      it "should run #{command}" do
+        say("@dj #{command}")
+        @command.should == command
+      end
+    end
+  end
+
 end
