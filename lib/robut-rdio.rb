@@ -110,15 +110,27 @@ class Robut::Plugin::Rdio
   end
 
   def play_result(number)
-    if @@results.nil? || @@results.empty?
+    if !has_results?
       reply("I don't have any search results") and return
     end
 
-    if @@results[number].nil?
+    if !has_result?(number)
       reply("I don't have that result") and return
     end
 
-    queue @@results[number]
+    queue result_at(number)
+  end
+
+  def has_results?
+    @@results && @@results.any?
+  end
+
+  def has_result?(number)
+    !@@results[number].nil?
+  end
+
+  def result_at(number)
+    @@results[number]
   end
 
   def queue(result)
