@@ -79,10 +79,14 @@ class Robut::Plugin::Rdio
       elsif words.join(' ') =~ /(find|do you have(\sany)?)\s?(.+[^?])\??/ 
         find(['',Regexp.last_match[-1]])
       else words.first =~ /play|(?:un)?pause|next|restart|back|clear/
-        Server.command << words.first
+        run_command(words.first)
       end
       
     end
+  end
+
+  def results
+    @@results
   end
 
   private
@@ -91,28 +95,48 @@ class Robut::Plugin::Rdio
     ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"}
   }
 
+  def run_command(command)
+    Server.command << command
+  end
+
   def find(query)
     reply("Searching for: #{query[1..-1].join(' ')}...")
     @@results = search(query)
 
-    result_display = ""
-    @@results.each_with_index do |result, index|
-      result_display += format_result(result, index) + "\n"
-    end
-
+    result_display = format_results(@@results)
     reply(result_display)
   end
 
+  def format_results(results)
+    result_display = ""
+    results.each_with_index do |result, index|
+      result_display += format_result(result, index) + "\n"
+    end
+    result_display
+  end
+
   def play_result(number)
-    if @@results.nil? || @@results.empty?
+    if !has_results?
       reply("I don't have any search results") and return
     end
 
-    if @@results[number].nil?
+    if !has_result?(number)
       reply("I don't have that result") and return
     end
 
-    queue @@results[number]
+    queue result_at(number)
+  end
+
+  def has_results?
+    @@results && @@results.any?
+  end
+
+  def has_result?(number)
+    !@@results[number].nil?
+  end
+
+  def result_at(number)
+    @@results[number]
   end
 
   def queue(result)
@@ -122,12 +146,12 @@ class Robut::Plugin::Rdio
     reply("Queuing: #{name}")
   end
 
+
   def format_result(search_result, index)
     response = RESULT_DISPLAYER[search_result.class].call(search_result)
     puts response
     "#{index}: #{response}"
   end
-
 
   # Searches Rdio for sources matching +words+. If the first word is
   # 'track', it only searches tracks, same for 'album'. Otherwise,
