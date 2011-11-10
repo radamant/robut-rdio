@@ -40,7 +40,9 @@ EOMSG
 while(true) do
   begin
     msg = ask('hipchat> ')
+
     @plugin.handle(Time.now, 'Bob', msg)
+
     if msg =~ /quit|exit/
       fade_out
     end
