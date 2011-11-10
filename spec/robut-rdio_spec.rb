@@ -23,14 +23,16 @@ describe "RobutRdio Super Integration Test" do
 
 
     it 'should make an rdio search' do
-      stub_search('neil young', 'harvest')
+      stub_search('neil young', ['harvest', 'after the gold rush'])
       say('@dj find neil young')
-      @reply.should == 'harvest'
+      @reply.should == "result: harvest\nresult: after the gold rush\n"
     end
 
     def stub_search(mock_query, results)
-      plugin.stub(:search).with(['', mock_query])
-      plugin.stub(:format_results){results}
+      plugin.stub(:search).with(['', mock_query]){results}
+      results.each do |result|
+        plugin.stub(:format_result).with(result, anything()){"result: #{result}"}
+      end
     end
 
     
@@ -77,6 +79,10 @@ describe "RobutRdio Super Integration Test" do
         @reply.should == "I don't have that result"
       end
     end
+  end
+
+  describe "I'm feeling lucky play/search" do
+  
   end
 
   describe 'running commands' do

@@ -108,9 +108,11 @@ class Robut::Plugin::Rdio
   end
 
   def format_results(results)
+    result_display = ""
     results.each_with_index do |result, index|
       result_display += format_result(result, index) + "\n"
     end
+    result_display
   end
 
   def play_result(number)
@@ -150,7 +152,6 @@ class Robut::Plugin::Rdio
     puts response
     "#{index}: #{response}"
   end
-
 
   # Searches Rdio for sources matching +words+. If the first word is
   # 'track', it only searches tracks, same for 'album'. Otherwise,
