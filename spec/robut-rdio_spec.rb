@@ -3,16 +3,16 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 # Wherein we test legacy code, and hopefully refactor and remove this file
 describe "RobutRdio Super Integration Test" do
   let(:plugin) do plugin = Robut::Plugin::Rdio.new(nil) 
-  def plugin.nick
-    "dj"
-  end
+    def plugin.nick
+      "dj"
+    end
 
 
-  plugin.stub(:reply){|msg|
-    @reply = msg
-  }
+    plugin.stub(:reply){|msg|
+      @reply = msg
+    }
 
-  plugin
+    plugin
   end
 
   def say(msg)
