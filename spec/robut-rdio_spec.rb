@@ -19,6 +19,11 @@ describe "RobutRdio Super Integration Test" do
     plugin.handle(Time.now, 'foo bar', msg)
   end
 
+  it 'should set up a callback for the Server on startup' do
+    say('boo')
+    Robut::Plugin::Rdio::Server.reply_callback.should_not be_nil
+  end
+
   describe "searching for tracks" do
 
     it 'should make an rdio search' do
