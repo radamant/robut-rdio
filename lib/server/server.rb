@@ -69,7 +69,7 @@ END
     end
 
     get '/now_playing/:title' do
-      self.class.reply_callback.call("Now playing: #{URI.unescape(params[:title])}")
+      self.class.reply_callback.call("Now playing: #{URI.unescape(params[:title])}") if self.class.reply_callback
     end
 
     # start the server if ruby file executed directly

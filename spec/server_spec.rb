@@ -19,4 +19,10 @@ describe Robut::Plugin::Rdio::Server do
     last_response.should be_ok
     @message.should == 'Now playing: The National - Bloodbuzz Ohio'
   end
+
+  it 'should degrade gracefully if a reply_callback has not been defined' do
+    Robut::Plugin::Rdio::Server.reply_callback = nil
+    get '/now_playing/Foo'
+    last_response.should be_ok
+  end
 end
