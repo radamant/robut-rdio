@@ -16,3 +16,6 @@ group :development do
   gem 'sinatra'
   gem 'highline'
 end
+group :test do
+  gem 'rack-test'
+end
