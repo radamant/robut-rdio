@@ -1,12 +1,96 @@
-robut-rdio
-====================
+# robut-rdio
 
-A web-powered RDIO plugin for robut
+Robut-rdio gives the ability for individuals within a [Hipchat](http://www.hipchat.com) chat room to enqueue, play, and manage songs through a web-based [rdio](http://www.rdio.com/) page. Robut-rdio is a plugin for [robut](https://github.com/justinweiss/robut).
 
-How to test Robut-Rdio interactively
-------------------
+## Usage (Commands)
 
-You can test the plugin in an interative shell with:
+### `find` and `play`
+
+As a user within a Hipchat channel, you will likely spend your time searching for and queuing music.
+
+```
+@dj find <ARTIST, ALBUM, TRACK>
+```
+
+A list of matching results will be returned and presented in the chat room.
+
+```
+<Index>: <Artist> - <Album> - <Track>
+```
+
+* You can enqueue one of the results by simply referencing the index number.
+* If there is no <Track> specified, the result will enqueue the entire <Album> for the specified <Artist>
+* Any user can make a selection from the results that are returned.
+* Making new requests of robut will replace any previously specified indexes.
+
+#### Example
+
+```
+user > @dj find Beck - Guero
+
+dj   > Searching for: guero...
+0: Beck - Guero
+1: Beck - Guero - E-Pro
+2: Beck - Guero - Girl
+3: Beck - Guero - Que' Onda Guero
+4: Beck - Guero - Black Tambourine
+5: Beck - Guero - Missing
+6: Beck - Guero - Hell Yes
+7: Beck - Guero - Earthquake Weather
+8: Beck - Guero - Go It Alone
+9: Beck - Guero - Broken Drum
+
+user > @dj play 0
+```
+
+### Controls
+
+* `pause` - pause the current playing song
+* `unpause` or `play` - will resume playing the current track
+* `next` will move to the next avaiable track
+* `back` will move to the previous track
+* `restart` will restart the current track over at the beginning
+* `clear` will remove all the currently enqueued songs
+
+
+## Installation
+
+### Requirements
+
+* [Robut](https://github.com/justinweiss/robut)
+* [Rdio API](http://developer.rdio.com/) (Key & Secret)
+
+### Robut Chatfile
+
+```ruby
+# Require the plugin into your chat file
+require 'robut-rdio'
+
+# Specify your RDIO_KEY and RDIO_SECRET
+Robut::Plugin::Rdio.key = "RDIO_KEY"
+Robut::Plugin::Rdio.secret = "RDIO_SECRET"
+
+# Start the Sinatra Server required to stream the music from Rdio
+Robut::Plugin::Rdio.start_server
+
+# Add the plugin to the list of available plugins
+Robut::Plugin.plugins << Robut::Plugin::Rdio
+
+# ... other robut configuration information ...
+```
+
+
+## Development
+
+### Robut-Rdio without Hipchat
+
+Robut-Rdio comes with an interactive shell mode that makes it wasy to interact with the Rdio service. This functionaliy allows you to interact with the plugin without the requirement of Hipchat.
+
+### Start the interactive shell
+
+* Clone the repository
+
+* Execute the following command:
 
 ```shell
 export RDIO_KEY=<your key>
@@ -14,9 +98,7 @@ export RDIO_SECRET=<your secret>
 rake shell
 ```
 
-This will open a pseudo-robut environment where anything entered into the shell will be responded to as if it were a hipchat message.
-
-You shoule see something like:
+* Visit the server and port specified in start up:
 
 ```shell
 == Sinatra/1.3.1 has taken the stage on 4567 for development with backup from Thin
@@ -24,20 +106,13 @@ You shoule see something like:
 >> Maximum connections set to 1024
 >> Listening on 0.0.0.0:4567, CTRL+C to stop
 Welcome to the robut plugin test environment.
-
-You can direct your messages to the bot using:
-@dj
-
-Type 'exit' or 'quit' to exit this session
-
-hipchat> 
-
 ```
 
-You can now point a web browser to the url that Rack gives you to run the client as well while you test the chat input.
+By default the server will start at [localhost:4567](http://localhost:4567). It is important that the page is open to allow requests that are made to be added to the queue maintained by the Rdio object within the page.
 
+* Make requests to the DJ within the interactive shell:
 
-Then you can do the following while your web browser responds to the changes:
+You can make any requests that you would normally make within a Hipchat channel. The bot will read and respond to requests prefaced with the username `@dj`.
 
 ```shell
 hipchat> @dj find guero
