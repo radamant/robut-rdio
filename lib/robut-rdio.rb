@@ -62,6 +62,7 @@ class Robut::Plugin::Rdio
   # will queue the first search result matching 'search query' into
   # the web player. It can be an artist, album, or song.
   def handle(time, sender_nick, message)
+    Server.reply_callback ||= lambda{|message| reply(message, :room)}
     ::Rdio.init(self.class.key, self.class.secret)
     words = words(message)
     

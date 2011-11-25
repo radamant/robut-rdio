@@ -16,7 +16,7 @@ def @plugin.nick
   return 'dj'
 end
 
-def @plugin.reply(msg)
+def @plugin.reply(msg, to = nil)
   puts msg
 end
 

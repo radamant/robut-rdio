@@ -3,9 +3,11 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
-# Add dependencies to develop your gem here.
-# Include everything needed to run rake, tests, features, etc.
 gem 'robut'
+gem 'rdio', '0.0.91' # .92 is horked
+gem 'sinatra'
+gem 'thin'
+
 group :development do
   gem "rspec", "~> 2.3.0"
   gem "bundler", "~> 1.0.0"
@@ -14,6 +16,6 @@ group :development do
   gem 'highline'
 end
 
-gem 'rdio', '0.0.91' # .92 is horked
-gem 'sinatra'
-gem 'thin'
+group :test do
+  gem 'rack-test'
+end

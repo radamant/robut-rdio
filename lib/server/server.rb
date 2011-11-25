@@ -34,6 +34,9 @@ class Robut::Plugin::Rdio
 
       # The domain associated with +token+. Defaults to localhost.
       attr_accessor :domain
+
+      # A callback set by to Robut plugin so the server can talk to it
+      attr_accessor :reply_callback
     end
     self.queue = []
     self.command = []
@@ -63,6 +66,10 @@ END
       command = self.class.command.dup
       self.class.command = []
       command.to_json
+    end
+
+    get '/now_playing/:title' do
+      self.class.reply_callback.call("Now playing: #{URI.unescape(params[:title])}") if self.class.reply_callback
     end
 
     # start the server if ruby file executed directly
