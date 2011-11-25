@@ -37,6 +37,8 @@ class Robut::Plugin::Rdio
 
       # A callback set by to Robut plugin so the server can talk to it
       attr_accessor :reply_callback
+      
+      attr_accessor :last_played_track
     end
     self.queue = []
     self.command = []
@@ -69,8 +71,16 @@ END
     end
 
     get '/now_playing/:title' do
-      self.class.reply_callback.call("Now playing: #{URI.unescape(params[:title])}") if self.class.reply_callback
+      if self.class.reply_callback and self.track_is_not_the_same_as_last?(URI.unescape(params[:title]))
+        self.class.reply_callback.call("Now playing: #{URI.unescape(params[:title])}") 
+        self.class.last_played_track = URI.unescape(params[:title])
+      end
     end
+
+    def track_is_not_the_same_as_last? current_track
+      self.class.last_played_track != current_track
+    end
+
 
     # start the server if ruby file executed directly
     run! if app_file == $0
