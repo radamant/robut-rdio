@@ -57,7 +57,7 @@ user > @dj play 0
 
 ## Reporting
 
-Robut-rdio can be configured to announce various events generated from the Rdio player callbacks. In the configuration you can enable/disable individual reporting to suit your required needs.
+Robut-rdio can be configured to announce various events generated from the Rdio player [callbacks](http://developer.rdio.com/docs/Web_Playback_API). In the configuration you can enable/disable individual reporting to suit your required needs.
 
 * Play State Changes - play, paused, stopped, or buffering
 * Track Changes - when a new track has started
