@@ -53,6 +53,17 @@ user > @dj play 0
 * `clear` will remove all the currently enqueued songs
 
 
+# Configuration
+
+## Reporting
+
+Robut-rdio can be configured to announce various events generated from the Rdio player callbacks. In the configuration you can enable/disable individual reporting to suit your required needs.
+
+* Play State Changes - play, paused, stopped, or buffering
+* Track Changes - when a new track has started
+* Playing Somewhere Else - when the same Rdio credentials have been used elsewhere, disabling playback on the current system.
+
+
 ## Installation
 
 ### Requirements
