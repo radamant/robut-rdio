@@ -53,6 +53,14 @@ user > @dj play 0
 * `clear` will remove all the currently enqueued songs
 
 
+### Web Controls
+
+The webpage itself allows for keyboard input. This allows for the system running the webpage to expose the ability to control the music similar to individuals within the chatroom. This has been tested with [Remote Buddy](http://www.iospirit.com/products/remotebuddy/) with custom keys mapped to the remote's buttons.
+
+* `space` to toggle playing and pausing the current playing track
+* `<-` or `p` to restart the current track or twice to move to the previous track
+* `->` or `n` to move to the next track
+
 ## Installation
 
 ### Requirements
