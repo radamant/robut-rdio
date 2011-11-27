@@ -45,6 +45,22 @@ h2 {
     visibility: hidden;
 }
 
+#player_state {
+  float: left;
+  vertical-align: middle;
+  padding-top: 5px;
+  padding-right: 20px;
+}
+
+#current_track {
+  min-height: 66px;
+}
+
+#current_track_name {
+  padding-top: 6px;
+}
+
+
 #filter {
   background: none; /* Old browsers */
 

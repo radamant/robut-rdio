@@ -2,9 +2,20 @@
 
 Robut-rdio gives the ability for individuals within a [Hipchat](http://www.hipchat.com) chat room to enqueue, play, and manage songs through a web-based [rdio](http://www.rdio.com/) page. Robut-rdio is a plugin for [robut](https://github.com/justinweiss/robut).
 
-## Usage (Commands)
+## Usage 
 
-### `find` and `play`
+### Controls
+
+* `find <ARTIST, ALBUM, TRACK>` - searches for the given term and returns a result set
+* `play <INDEX>` - play the track with the given index in the result set
+* `pause` - pause the current playing song
+* `unpause` or `play` - will resume playing the current track
+* `next` will move to the next avaiable track
+* `back` will move to the previous track
+* `restart` will restart the current track over at the beginning
+* `clear` will remove all the currently enqueued songs
+
+#### `find` and `play`
 
 As a user within a Hipchat channel, you will likely spend your time searching for and queuing music.
 
@@ -23,7 +34,7 @@ A list of matching results will be returned and presented in the chat room.
 * Any user can make a selection from the results that are returned.
 * Making new requests of robut will replace any previously specified indexes.
 
-#### Example
+##### Example
 
 ```
 user > @dj find Beck - Guero
@@ -43,14 +54,25 @@ dj   > Searching for: guero...
 user > @dj play 0
 ```
 
-### Controls
+### Web 
 
-* `pause` - pause the current playing song
-* `unpause` or `play` - will resume playing the current track
-* `next` will move to the next avaiable track
-* `back` will move to the previous track
-* `restart` will restart the current track over at the beginning
-* `clear` will remove all the currently enqueued songs
+Along with the bot within the hipchat channel to provide you with feedback information, the webpage playing the music also provides information about the state of the current track and playlist. Most of the images used are standard images to represent: play; paused; and stopped. There are two other states that are important to note:
+
+![Buffering](../raw/event-reporting/lib/server/public/images/buffering.png) This appears when a track is first loaded and the audio data is being loaded for playback.
+
+![Disconnected](../raw/event-reporting/lib/server/public/images/disconnected.png) This appears when the current Rdio account is being used in another location. This will prevent all playback.
+
+
+
+## Configuration
+
+### Reporting
+
+Robut-rdio can be configured to announce various events generated from the Rdio player [callbacks](http://developer.rdio.com/docs/Web_Playback_API). In the configuration you can enable/disable individual reporting to suit your required needs.
+
+* Play State Changes - play, paused, stopped, or buffering
+* Track Changes - when a new track has started
+* Playing Somewhere Else - when the same Rdio credentials have been used elsewhere, disabling playback on the current system.
 
 
 ### Web Controls

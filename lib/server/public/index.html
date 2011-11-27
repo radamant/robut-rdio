@@ -1,5 +1,10 @@
 <!doctype html>
-<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]--><!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]--><!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]--><!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]--><!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]--><head>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	
@@ -11,13 +16,17 @@
   <link rel="stylesheet" href="css/rdio.css">
   <link rel="stylesheet" href="css/style_after.css?v=2">
 
-	<script src="js/libs/modernizr-1.7.min.js"></script></head>
-<body>
+	<script src="js/libs/modernizr-1.7.min.js"></script>
+</head>
+<body>  
   <div id="apiswf"></div>
-
   <div id="content">
     <div id="player">
-      <h1 id="current_track">Now Playing: </h1>
+      <h1 id="current_track">
+        <div id="player_state"><img src="images/buffering.png"/>
+          <img src="images/circle-play.png"/></div>
+        <div id="current_track_name"></div>
+      </h1>
       <div id="controls">
         <img id="album_art" src="images/no-album.png" />
         <div id="filter" >
@@ -39,5 +48,6 @@
 	<!--[if lt IE 7 ]>
 	<script src="js/libs/dd_belatedpng.js"></script>
 	<script> DD_belatedPNG.fix('img, .png_bg');</script>
-	<![endif]--></body>
+	<![endif]-->
+</body>
 </html>
