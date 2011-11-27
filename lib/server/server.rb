@@ -69,19 +69,31 @@ END
       self.class.command = []
       command.to_json
     end
+    
+    # Make an announcement into the Hipchat channel
+    get '/announcement/:message' do
+      self.announce! URI.unescape(params[:announcement])
+    end
 
+    # Make a now playing announcmenet into the Hipchat channel
     get '/now_playing/:title' do
-      if self.class.reply_callback and self.track_is_not_the_same_as_last?(URI.unescape(params[:title]))
-        self.class.reply_callback.call("Now playing: #{URI.unescape(params[:title])}") 
-        self.class.last_played_track = URI.unescape(params[:title])
+      track_title = URI.unescape(params[:title])
+      
+      if self.track_is_not_the_same_as_last? track_title
+        self.announce! "Now playing: #{track_title}"
+        self.class.last_played_track = track_title
       end
     end
 
+   
+    def announce!(message)
+      self.class.reply_callback.call(message) if self.class.reply_callback
+    end
+    
     def track_is_not_the_same_as_last? current_track
       self.class.last_played_track != current_track
     end
-
-
+    
     # start the server if ruby file executed directly
     run! if app_file == $0
   end
