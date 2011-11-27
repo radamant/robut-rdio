@@ -58,21 +58,9 @@ user > @dj play 0
 
 Along with the bot within the hipchat channel to provide you with feedback information, the webpage playing the music also provides information about the state of the current track and playlist. Most of the images used are standard images to represent: play; paused; and stopped. There are two other states that are important to note:
 
-![Buffering](../raw/event-reporting/lib/server/public/images/buffering.png) This appears when a track is first loaded and the audio data is being loaded for playback.
+![Buffering](../raw/lib/server/public/images/buffering.png) This appears when a track is first loaded and the audio data is being loaded for playback.
 
-![Disconnected](../raw/event-reporting/lib/server/public/images/disconnected.png) This appears when the current Rdio account is being used in another location. This will prevent all playback.
-
-
-
-## Configuration
-
-### Reporting
-
-Robut-rdio can be configured to announce various events generated from the Rdio player [callbacks](http://developer.rdio.com/docs/Web_Playback_API). In the configuration you can enable/disable individual reporting to suit your required needs.
-
-* Play State Changes - play, paused, stopped, or buffering
-* Track Changes - when a new track has started
-* Playing Somewhere Else - when the same Rdio credentials have been used elsewhere, disabling playback on the current system.
+![Disconnected](../raw/lib/server/public/images/disconnected.png) This appears when the current Rdio account is being used in another location. This will prevent all playback.
 
 
 ### Web Controls
