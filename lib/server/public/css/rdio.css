@@ -12,7 +12,7 @@ h1, h2 {
   background-color: #fff;
   text-rendering: optimizeLegibility;
   padding: 8px 12px;
-  display: none;
+/*  display: none;*/
 }
 
 h1 {
