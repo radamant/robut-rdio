@@ -72,12 +72,12 @@ END
     
     # Make an announcement into the Hipchat channel
     get '/announcement/:message' do
-      self.announce! URI.unescape(params[:announcement])
+      self.announce! URI.unescape(params[:message].to_s)
     end
 
     # Make a now playing announcmenet into the Hipchat channel
     get '/now_playing/:title' do
-      track_title = URI.unescape(params[:title])
+      track_title = URI.unescape(params[:title].to_s)
       
       if self.track_is_not_the_same_as_last? track_title
         self.announce! "Now playing: #{track_title}"
