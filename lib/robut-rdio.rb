@@ -107,7 +107,7 @@ class Robut::Plugin::Rdio
         
       elsif search?(words)
         
-        find(['',words.join(' ')[search_regex,-1]])
+        find words.join(' ')[search_regex,-1]
       
       else playback?(words)
         
@@ -134,7 +134,7 @@ class Robut::Plugin::Rdio
   end
 
   def find(query)
-    reply("Searching for: #{query[1..-1].join(' ')}...")
+    reply("Searching for: #{query}...")
     @@results = search(query)
 
     result_display = format_results(@@results)
@@ -196,18 +196,19 @@ class Robut::Plugin::Rdio
   #
   def search(words)
     api = ::Rdio::Api.new(self.class.key, self.class.secret)
-
-    if words[1] == "album"
-      query_string = words[2..-1].join(' ')
+    words = words.split(' ')
+    
+    if words.first == "album"
+      query_string = words[1..-1].join(' ')
       results = api.search(query_string, "Album")
-    elsif words[1] == "track"
-      query_string = words[2..-1].join(' ')
+    elsif words.first == "track"
+      query_string = words[1..-1].join(' ')
       results = api.search(query_string, "Track")
-    elsif words[1] == "artist"
-      query_string = words[2..-1].join(' ')
+    elsif words.first == "artist"
+      query_string = words[1..-1].join(' ')
       results = api.search(query_string, "Artist")
    else
-      query_string = words[1..-1].join(' ')
+      query_string = words.join(' ')
       results = api.search(query_string, "Track")
     end
   end
