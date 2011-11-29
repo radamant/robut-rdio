@@ -117,8 +117,6 @@ class Robut::Plugin::Rdio
       
     end
     
-  rescue => exception
-    reply "#{exception.to_s} #{exception.backtrace.join("\n")}"
   end
 
   def results
