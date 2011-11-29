@@ -16,36 +16,7 @@ Gem::Specification.new do |s|
     "LICENSE.txt",
     "README.md"
   ]
-  s.files = [
-    ".document",
-    ".rspec",
-    ".rvmrc",
-    "Gemfile",
-    "Gemfile.lock",
-    "LICENSE.txt",
-    "README.md",
-    "Rakefile",
-    "VERSION",
-    "lib/robut-rdio.rb",
-    "lib/server/public/css/rdio.css",
-    "lib/server/public/css/style.css",
-    "lib/server/public/css/style_after.css",
-    "lib/server/public/images/background.png",
-    "lib/server/public/images/no-album.png",
-    "lib/server/public/index.html",
-    "lib/server/public/js/libs/dd_belatedpng.js",
-    "lib/server/public/js/libs/jquery-1.5.1.min.js",
-    "lib/server/public/js/libs/modernizr-1.7.min.js",
-    "lib/server/public/js/rdio.js",
-    "lib/server/public/js/script.js",
-    "lib/server/server.rb",
-    "lib/tasks/shell.rake",
-    "plugin-tester.rb",
-    "robut-rdio.gemspec",
-    "spec/robut-rdio_spec.rb",
-    "spec/server_spec.rb",
-    "spec/spec_helper.rb"
-  ]
+  s.files = `git ls-files`.split("\n") 
   s.homepage = %q{http://github.com/radamant/robut-rdio}
   s.licenses = [%q{MIT}]
   s.require_paths = [%q{lib}]
@@ -57,7 +28,6 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<robut>, [">= 0"])
-      s.add_runtime_dependency(%q<robut-rdio>, [">= 0"])
       s.add_runtime_dependency(%q<rdio>, ["= 0.0.91"])
       s.add_runtime_dependency(%q<sinatra>, [">= 0"])
       s.add_runtime_dependency(%q<thin>, [">= 0"])
@@ -68,7 +38,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<highline>, [">= 0"])
     else
       s.add_dependency(%q<robut>, [">= 0"])
-      s.add_dependency(%q<robut-rdio>, [">= 0"])
       s.add_dependency(%q<rdio>, ["= 0.0.91"])
       s.add_dependency(%q<sinatra>, [">= 0"])
       s.add_dependency(%q<thin>, [">= 0"])
@@ -80,7 +49,6 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<robut>, [">= 0"])
-    s.add_dependency(%q<robut-rdio>, [">= 0"])
     s.add_dependency(%q<rdio>, ["= 0.0.91"])
     s.add_dependency(%q<sinatra>, [">= 0"])
     s.add_dependency(%q<thin>, [">= 0"])
