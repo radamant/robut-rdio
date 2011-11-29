@@ -57,7 +57,27 @@ class Robut::Plugin::Rdio
       "#{at_nick} restart - restart the current track"
     ]
   end
+ 
+  def play?(request)
+    Array(request).join(' ') =~ /^(play)?\s?(result)?\s?\d/
+  end
 
+  def search_regex
+    /(find|do you have(\sany)?)\s?(.+[^?])\??/
+  end
+  
+  def search?(request)
+    Array(request).join(' ') =~ search_regex
+  end
+
+  def search_and_play?(request)
+    Array(request).first == 'play' and Array(request).length > 1
+  end
+
+  def playback?(request)
+    Array(request).first =~ /play|(?:un)?pause|next|restart|back|clear/
+  end
+  
   # Queues songs into the Rdio web player. @nick play search query
   # will queue the first search result matching 'search query' into
   # the web player. It can be an artist, album, or song.
@@ -70,9 +90,13 @@ class Robut::Plugin::Rdio
     words = words(message)
     
     if sent_to_me?(message)
-      if words.join(' ') =~ /^(play)?\s?(result)?\s?\d/
+      
+      if play?(words)
+        
         play_result(words.last.to_i)
-      elsif words.first == 'play' and words.length > 1
+        
+      elsif search_and_play?(words)
+        
         results = search(words)
         result = results.first
         if result
@@ -80,13 +104,21 @@ class Robut::Plugin::Rdio
         else
           reply("I couldn't find #{words.join(" ")} on Rdio.")
         end
-      elsif words.join(' ') =~ /(find|do you have(\sany)?)\s?(.+[^?])\??/ 
-        find(['',Regexp.last_match[-1]])
-      else words.first =~ /play|(?:un)?pause|next|restart|back|clear/
+        
+      elsif search?(words)
+        
+        find(['',words.join(' ')[search_regex,-1]])
+      
+      else playback?(words)
+        
         run_command(words.first)
+        
       end
       
     end
+    
+  rescue => exception
+    reply "#{exception.to_s} #{exception.backtrace.join("\n")}"
   end
 
   def results
@@ -173,7 +205,10 @@ class Robut::Plugin::Rdio
     elsif words[1] == "track"
       query_string = words[2..-1].join(' ')
       results = api.search(query_string, "Track")
-    else
+    elsif words[1] == "artist"
+      query_string = words[2..-1].join(' ')
+      results = api.search(query_string, "Artist")
+   else
       query_string = words[1..-1].join(' ')
       results = api.search(query_string, "Track")
     end
