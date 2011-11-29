@@ -38,6 +38,9 @@ class Robut::Plugin::Rdio
       # A callback set by to Robut plugin so the server can talk to it
       attr_accessor :reply_callback
       
+      # A callback for Hipchat Chat room to set the state of the robut
+      attr_accessor :state_callback
+      
       attr_accessor :last_played_track
     end
     self.queue = []
@@ -80,12 +83,15 @@ END
       track_title = URI.unescape(params[:title].to_s)
       
       if self.track_is_not_the_same_as_last? track_title
-        self.announce! "Now playing: #{track_title}"
+        self.state! "Now playing: #{track_title}"
         self.class.last_played_track = track_title
       end
     end
-
-   
+    
+    def state!(message)
+      self.class.state_callback.call(message) if self.class.state_callback
+    end
+    
     def announce!(message)
       self.class.reply_callback.call(message) if self.class.reply_callback
     end
