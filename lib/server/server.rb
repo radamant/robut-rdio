@@ -83,7 +83,7 @@ END
       track_title = URI.unescape(params[:title].to_s)
       
       if self.track_is_not_the_same_as_last? track_title
-        self.state! "Now playing: #{track_title}"
+        self.state! "is now playing: #{track_title}"
         self.class.last_played_track = track_title
       end
     end
