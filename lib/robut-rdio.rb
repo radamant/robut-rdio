@@ -157,9 +157,13 @@ class Robut::Plugin::Rdio
     "#{index}: #{response}"
   end
 
-  # Searches Rdio for sources matching +words+. If the first word is
-  # 'track', it only searches tracks, same for 'album'. Otherwise,
-  # matches both albums and tracks.
+  # Searches Rdio for sources matching +words+. 
+  # 
+  # Given an array of Strings, which are the search terms, use Rdio to find any
+  # tracks that match. If the first word happens be `album` then search for
+  # albums that match the criteria.
+  #
+  #
   def search(words)
     api = ::Rdio::Api.new(self.class.key, self.class.secret)
 
@@ -171,7 +175,7 @@ class Robut::Plugin::Rdio
       results = api.search(query_string, "Track")
     else
       query_string = words[1..-1].join(' ')
-      results = api.search(query_string, "Album,Track")
+      results = api.search(query_string, "Track")
     end
   end
 
