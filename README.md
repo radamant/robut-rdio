@@ -20,7 +20,7 @@ Robut-rdio gives the ability for individuals within a [Hipchat](http://www.hipch
 As a user within a Hipchat channel, you will likely spend your time searching for and queuing music.
 
 ```
-@dj find <ARTIST, ALBUM, TRACK>
+@dj find <Track>
 ```
 
 A list of matching results will be returned and presented in the chat room.
@@ -30,9 +30,29 @@ A list of matching results will be returned and presented in the chat room.
 ```
 
 * You can enqueue one of the results by simply referencing the index number.
-* If there is no <Track> specified, the result will enqueue the entire <Album> for the specified <Artist>
 * Any user can make a selection from the results that are returned.
 * Making new requests of robut will replace any previously specified indexes.
+
+
+##### Search By Album
+
+```
+@dj find album <Album>
+```
+
+##### Search By Artist
+
+```
+@dj find artist <Artist>
+```
+
+##### Search by Sledgehammer
+
+When you want to search for a matching Artist, Album, or Track use **ALL**.
+
+```
+@dj find ALL <Artist, Album, or Track>
+```
 
 ##### Example
 
