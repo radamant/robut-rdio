@@ -3,7 +3,9 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
-gem 'robut'
+gem 'robut', :git => 'git://github.com/substantial/robut.git', 
+  :ref => '37de65af7c42ea691f3e76e8952a5821b8170be0'
+
 gem 'rdio', '0.0.91' # .92 is horked
 gem 'sinatra'
 gem 'thin'
