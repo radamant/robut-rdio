@@ -54,6 +54,7 @@ class Robut::Plugin::Rdio
       "#{at_nick} play track <track> - queues <track> for playing",
       "#{at_nick} play/unpause - unpauses the track that is currently playing",
       "#{at_nick} next - move to the next track",
+      "#{at_nick} next|skip album - skip all tracks in the current album group",
       "#{at_nick} restart - restart the current track"
     ]
   end
@@ -76,6 +77,10 @@ class Robut::Plugin::Rdio
 
   def playback?(request)
     Array(request).first =~ /play|(?:un)?pause|next|restart|back|clear/
+  end
+
+  def skip_album?(message)
+    message =~ /(next|skip) album/
   end
   
   # Queues songs into the Rdio web player. @nick play search query
@@ -109,6 +114,10 @@ class Robut::Plugin::Rdio
         
         find words.join(' ')[search_regex,-1]
       
+      elsif skip_album?(message)
+
+        run_command("next_album")
+
       else playback?(words)
         
         run_command(words.first)

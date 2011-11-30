@@ -88,7 +88,6 @@ describe "RobutRdio Super Integration Test" do
   describe "I'm feeling lucky play/search" do
   
   end
-
   describe 'running commands' do
     before do
       plugin.stub(:run_command) { |command| @command = command }
@@ -99,6 +98,21 @@ describe "RobutRdio Super Integration Test" do
         say("@dj #{command}")
         @command.should == command
       end
+    end
+  end
+
+  describe 'skipping an album' do
+    before do
+      plugin.stub(:run_command) { |command| @command = command }
+    end
+    it "should run next_album for `next album`" do
+      say("@dj next album")
+      @command.should == "next_album"
+    end
+
+    it "should run next_album for `skip album`" do
+      say("@dj skip album")
+      @command.should == "next_album"
     end
   end
 
