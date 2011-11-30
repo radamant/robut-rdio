@@ -77,6 +77,10 @@ class Robut::Plugin::Rdio
   def playback?(request)
     Array(request).first =~ /play|(?:un)?pause|next|restart|back|clear/
   end
+
+  def skip_album?(message)
+    message =~ /next album/
+  end
   
   # Queues songs into the Rdio web player. @nick play search query
   # will queue the first search result matching 'search query' into
@@ -109,6 +113,10 @@ class Robut::Plugin::Rdio
         
         find words.join(' ')[search_regex,-1]
       
+      elsif skip_album?(message)
+
+        run_command("next_album")
+
       else playback?(words)
         
         run_command(words.first)
