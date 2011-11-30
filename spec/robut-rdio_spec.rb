@@ -105,8 +105,13 @@ describe "RobutRdio Super Integration Test" do
     before do
       plugin.stub(:run_command) { |command| @command = command }
     end
-    it "should run next_album" do
+    it "should run next_album for `next album`" do
       say("@dj next album")
+      @command.should == "next_album"
+    end
+
+    it "should run next_album for `skip album`" do
+      say("@dj skip album")
       @command.should == "next_album"
     end
   end

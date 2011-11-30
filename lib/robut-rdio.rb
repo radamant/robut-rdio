@@ -79,7 +79,7 @@ class Robut::Plugin::Rdio
   end
 
   def skip_album?(message)
-    message =~ /next album/
+    message =~ /(next|skip) album/
   end
   
   # Queues songs into the Rdio web player. @nick play search query
