@@ -102,7 +102,7 @@ class Robut::Plugin::Rdio
         
       elsif search_and_play?(words)
         
-        results = search(words)
+        results = search(message)
         result = results.first
         if result
           queue(result)
