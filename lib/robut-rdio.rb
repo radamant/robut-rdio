@@ -54,6 +54,7 @@ class Robut::Plugin::Rdio
       "#{at_nick} play track <track> - queues <track> for playing",
       "#{at_nick} play/unpause - unpauses the track that is currently playing",
       "#{at_nick} next - move to the next track",
+      "#{at_nick} next|skip album - skip all tracks in the current album group",
       "#{at_nick} restart - restart the current track"
     ]
   end
