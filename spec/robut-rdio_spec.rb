@@ -33,7 +33,7 @@ describe "RobutRdio Super Integration Test" do
     end
 
     def stub_search(mock_query, results)
-      plugin.stub(:search).with(['', mock_query]) { results }
+      plugin.stub(:search).with(mock_query) { results }
       results.each do |result|
         plugin.stub(:format_result).with(result, anything()) { "result: #{result}" }
       end
