@@ -46,14 +46,6 @@ A list of matching results will be returned and presented in the chat room.
 @dj find artist <Artist>
 ```
 
-##### Search by Sledgehammer
-
-When you want to search for a matching Artist, Album, or Track use **ALL**.
-
-```
-@dj find ALL <Artist, Album, or Track>
-```
-
 ##### Example
 
 ```
