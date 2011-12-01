@@ -59,26 +59,51 @@ class Robut::Plugin::Rdio
     ]
   end
  
+  #
+  # @param [String,Array] request that is being evaluated as a play request
+  # @return [Boolean]
+  #
   def play?(request)
     Array(request).join(' ') =~ /^(play)?\s?(result)?\s?\d/
   end
 
+  #
+  # @return [Regex] that is used to match searches for their parameters
+  # @see http://rubular.com/?regex=(find%7Cdo%20you%20have(%5Csany)%3F)%5Cs%3F(.%2B%5B%5E%3F%5D)%5C%3F%3F
+  # 
   def search_regex
     /(find|do you have(\sany)?)\s?(.+[^?])\??/
   end
   
+  #
+  # @param [String,Array] request that is being evaluated as a search request
+  # @return [Boolean]
+  #
   def search?(request)
     Array(request).join(' ') =~ search_regex
   end
 
+  #
+  # @param [String,Array] request that is being evaluated as a search and playback 
+  #   request
+  # @return [Boolean]
+  #
   def search_and_play?(request)
-    Array(request).first == 'play' and Array(request).length > 1
+    Array(request).join(' ') =~ /^play\b[^\b]+/
   end
 
+  #
+  # @param [String,Array] request that is being evaluated as a playback request
+  # @return [Boolean]
+  #
   def playback?(request)
-    Array(request).first =~ /play|(?:un)?pause|next|restart|back|clear/
+    Array(request).join(' ') =~ /^(?:play|(?:un)?pause|next|restart|back|clear|(?:next|skip) album)$/
   end
 
+  #
+  # @param [String,Array] request that is being evaluated as a skip album request
+  # @return [Boolean]
+  #
   def skip_album?(message)
     message =~ /(next|skip) album/
   end
@@ -120,7 +145,7 @@ class Robut::Plugin::Rdio
 
       else playback?(words)
         
-        run_command(words.first)
+        run_command(words.join("_"))
         
       end
       

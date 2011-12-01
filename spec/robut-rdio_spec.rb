@@ -48,6 +48,7 @@ describe Robut::Plugin::Rdio do
     
     # Though it is acceptable for the plugin to return a String here,
     # it is important that we return an Enumerable list of instruction examples
+    # as we have so many different commands.
     it "should return a list of commands on how to use the plugin" do
       subject.usage.should be_kind_of(Enumerable)
     end
@@ -142,6 +143,8 @@ describe Robut::Plugin::Rdio do
           "restart",
           "back",
           "clear",
+          "skip album",
+          "next album",
           [ "play" ]
         ]
       end
@@ -149,6 +152,7 @@ describe Robut::Plugin::Rdio do
       let(:invalid_requests) do
         [ 
           " play",
+          "play       ",
           "player",
           "play-pause",
           "clearing house"
