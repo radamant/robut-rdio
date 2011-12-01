@@ -18,6 +18,7 @@ group :development do
   gem 'highline'
   gem 'guard'
   gem 'guard-rspec'
+  gem 'cucumber'
 end
 
 group :test do
