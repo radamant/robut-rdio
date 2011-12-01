@@ -93,10 +93,10 @@ class Robut::Plugin::Rdio
   end
 
   #
-  # @param [String,Array] request that is being evaluated as a playback request
+  # @param [String,Array] request that is being evaluated as a command request
   # @return [Boolean]
   #
-  def playback?(request)
+  def command?(request)
     Array(request).join(' ') =~ /^(?:play|(?:un)?pause|next|restart|back|clear)$/
   end
 
@@ -143,7 +143,7 @@ class Robut::Plugin::Rdio
 
         run_command("next_album")
 
-      else playback?(words)
+      else command?(words)
         
         run_command(words.join("_"))
         

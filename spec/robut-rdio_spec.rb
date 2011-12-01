@@ -130,7 +130,7 @@ describe Robut::Plugin::Rdio do
       
     end
     
-    describe "#playback?", :method => :playback? do
+    describe "#command?", :method => :command? do
       
       it_should_behave_like "a routing method"
       
