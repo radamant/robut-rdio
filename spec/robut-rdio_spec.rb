@@ -143,8 +143,6 @@ describe Robut::Plugin::Rdio do
           "restart",
           "back",
           "clear",
-          "skip album",
-          "next album",
           [ "play" ]
         ]
       end

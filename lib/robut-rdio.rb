@@ -97,7 +97,7 @@ class Robut::Plugin::Rdio
   # @return [Boolean]
   #
   def playback?(request)
-    Array(request).join(' ') =~ /^(?:play|(?:un)?pause|next|restart|back|clear|(?:next|skip) album)$/
+    Array(request).join(' ') =~ /^(?:play|(?:un)?pause|next|restart|back|clear)$/
   end
 
   #
