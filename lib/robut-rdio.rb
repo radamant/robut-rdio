@@ -70,12 +70,42 @@ class Robut::Plugin::Rdio
     ]
   end
  
+  
+  #
+  # @param [String,Array] request that is being evaluated as a play request
+  # @return [Boolean]
+  #
+  def play_results_regex
+    /^(?:play)?\s?(?:result)?\s?((?:\d[\s,-]*)+)$/
+  end
+  
   #
   # @param [String,Array] request that is being evaluated as a play request
   # @return [Boolean]
   #
   def play?(request)
-    Array(request).join(' ') =~ /^(play)?\s?(result)?\s?\d/
+    Array(request).join(' ') =~ play_results_regex
+  end
+
+  #
+  # @param [Array,String] track_request the play request that is going to be 
+  #   parsed for available tracks.
+  # 
+  # @return [Array] track numbers that were identified.
+  # 
+  # @example Requesting multiple tracks
+  # 
+  #     "play 1"
+  #     "play 1 2"
+  #     "play 1,2"
+  #     "play 1-3"
+  #     "play 1, 2 4-6"
+  #
+  def parse_tracks_to_play(track_request)
+    Array(track_request).join(' ')[play_results_regex,-1].to_s.split(/(?:\s|,\s?)/).map do |track| 
+      tracks = track.split("-")
+      (tracks.first.to_i..tracks.last.to_i).to_a
+    end.flatten
   end
 
   #
@@ -131,8 +161,8 @@ class Robut::Plugin::Rdio
     if sent_to_me?(message)
 
       if play?(words)
-        
-        play_result(words.last.to_i)
+
+        play_result *parse_tracks_to_play(words)
         
       elsif search_and_play?(words)
         
@@ -195,16 +225,22 @@ class Robut::Plugin::Rdio
     result_display
   end
 
-  def play_result(number)
+  def play_result(*requests)
+    
     if !has_results?
       reply("I don't have any search results") and return
     end
-
-    if !has_result?(number)
-      reply("I don't have that result") and return
+    
+    requests.flatten.each do |request|
+      
+      if has_result?(request.to_i)
+        queue result_at(request.to_i)
+      else
+        reply("I don't have that result")
+      end
+      
     end
-
-    queue result_at(number)
+    
   end
   
   def search_and_play_result(message)

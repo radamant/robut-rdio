@@ -27,7 +27,7 @@ describe Robut::Plugin::Rdio do
     
   end
   
-  describe "Routing Methods" do
+  describe "Routing Methods" do 
     
     describe "#play?", :method => :play? do
       
@@ -35,12 +35,19 @@ describe Robut::Plugin::Rdio do
 
       let(:valid_requests) do
         [ 
-          "play 0", 
+          # play keyword
+          "play 0",
           "play 999999", 
           [ "play", "0" ], 
+          # result keyword
           "result1", 
           "result 1", 
-          [ "result 0"] 
+          [ "result 0"],
+          # multiple tracks
+          "play 1, 2, 3",
+          "play 1 2 3",
+          "play 1 - 3",
+          "play 1-3"
         ]
       end
 
@@ -163,6 +170,15 @@ describe Robut::Plugin::Rdio do
         
         it_should_behave_like "a successfully routed action", 
           :route => :play?, :action => :play_result, :parameters => 0
+        
+      end
+      
+      context "when it is a multiple play request" do
+        
+        let(:message) { "@dj play 1, 4 5-7" }
+        
+        it_should_behave_like "a successfully routed action",
+          :route => :play?, :action => :play_result, :parameters => [1,4,5,6,7]
         
       end
       
