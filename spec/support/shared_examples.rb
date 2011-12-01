@@ -31,3 +31,17 @@ shared_examples "a routing method" do
   end
   
 end
+
+
+shared_examples "a successfully routed action" do |parameters|
+  
+  it "should route the request to the correct action with the correct parameters" do
+    
+    # TODO I have forgotten how to set up an expectation without replacing the original method result
+    # subject.should_receive(parameters[:route]).once
+    subject.should_receive(parameters[:action]).with(*parameters[:parameters]).and_return(parameters[:returning])
+    subject.handle(time,sender,message)
+    
+  end
+  
+end

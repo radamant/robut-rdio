@@ -129,19 +129,17 @@ class Robut::Plugin::Rdio
     words = words(message)
     
     if sent_to_me?(message)
-      
+
       if play?(words)
         
         play_result(words.last.to_i)
         
       elsif search_and_play?(words)
         
-        results = search(message)
-        result = results.first
-        if result
-          queue(result)
-        else
-          reply("I couldn't find #{words.join(" ")} on Rdio.")
+        search_and_play_criteria = words[1..-1].join(" ")
+        
+        unless search_and_play_result search_and_play_criteria
+          reply("I couldn't find '#{search_and_play_criteria}' on Rdio.")
         end
         
       elsif search?(words)
@@ -162,6 +160,11 @@ class Robut::Plugin::Rdio
     
   end
 
+  #
+  # As the plugin is initialized each time a request is made, the plugin maintains
+  # the state of the results from the last search request to ensure that it will
+  # be available when someone makes another request.
+  # 
   def results
     @@results
   end
@@ -202,6 +205,15 @@ class Robut::Plugin::Rdio
     end
 
     queue result_at(number)
+  end
+  
+  def search_and_play_result(message)
+    
+    if result = Array(search(message)).first
+      queue(result)
+      true
+    end
+    
   end
 
   def has_results?

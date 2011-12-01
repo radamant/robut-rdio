@@ -10,6 +10,8 @@ describe Robut::Plugin::Rdio do
     Robut::Plugin::Rdio.new connection 
   }
   
+  let(:sender) { "sender" }
+  
   let!(:store) { {} }
   
   let(:time) { Time.now }
@@ -137,6 +139,84 @@ describe Robut::Plugin::Rdio do
       
       subject.should_receive(:establish_server_callbacks!).and_return(nil)
       subject.handle(time,"","")
+      
+    end
+
+    context "when not sent to the agent" do
+
+      let(:message) { "This message does not mention the dj" }
+      
+      it "should perform no action" do
+        
+        subject.should_not_receive(:play?)
+        subject.handle(time,sender,message)
+        
+      end
+      
+    end
+    
+    context "when sent to the agent" do
+      
+      context "when it is a play request" do
+        
+        let(:message) { "@dj play 0" }
+        
+        it_should_behave_like "a successfully routed action", 
+          :route => :play?, :action => :play_result, :parameters => 0
+        
+      end
+      
+      context "when it is a search and play request" do
+        
+        let(:message) { "@dj play the misfits" }
+
+        context "when the search returns a result" do
+          
+          it_should_behave_like "a successfully routed action", 
+            :route => :search_and_play?, :action => :search_and_play_result, 
+              :parameters => "the misfits", :returning => true
+          
+        end
+        
+        context "when the search result does not return a result" do
+
+          before :each do 
+            subject.should_receive(:reply).with("I couldn't find 'the misfits' on Rdio.")
+          end
+
+          it_should_behave_like "a successfully routed action", 
+            :route => :search_and_play?, :action => :search_and_play_result, :parameters => "the misfits"
+          
+        end
+        
+      end
+      
+      context "when it is a search request" do
+        
+        let(:message) { "@dj find the partridge family" }
+        
+        it_should_behave_like "a successfully routed action",
+          :route => :search?, :action => :find, :parameters => "the partridge family"
+        
+      end
+      
+      context "when it is a skip album request" do
+        
+        let(:message) { "skip album @dj" }
+        
+        it_should_behave_like "a successfully routed action",
+          :route => :skip_album?, :action => :run_command, :parameters => "next_album"
+        
+      end
+      
+      context "when it is command" do
+        
+        let(:message) { "@dj pause" }
+        
+        it_should_behave_like "a successfully routed action",
+          :route => :command?, :action => :run_command, :parameters => "pause"
+        
+      end
       
     end
     
