@@ -131,4 +131,16 @@ describe Robut::Plugin::Rdio do
     
   end
   
+  describe "#handle" do
+    
+    it "should create a communication channel with the music server" do
+      
+      subject.should_receive(:establish_server_callbacks!).and_return(nil)
+      subject.handle(time,"","")
+      
+    end
+    
+    
+  end
+  
 end

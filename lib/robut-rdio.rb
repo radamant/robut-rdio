@@ -45,6 +45,17 @@ class Robut::Plugin::Rdio
     Server.token = self.token || "GAlNi78J_____zlyYWs5ZG02N2pkaHlhcWsyOWJtYjkyN2xvY2FsaG9zdEbwl7EHvbylWSWFWYMZwfc="
     Server.domain = self.domain || "localhost"
   end
+  
+  #
+  # Because an instance of this plugin is not created until the Robut client has
+  # recieved at least one message. The server callbacks need to be created during
+  # the #handle request. This allows for the server to communicate back through
+  # the Robut communication channel that it receives the messages.
+  # 
+  def establish_server_callbacks!
+    Server.reply_callback ||= lambda{|message| reply(message, :room)}
+    Server.state_callback ||= lambda{|message| reply("/me #{message}", :room)}
+  end
 
   # Returns a description of how to use this plugin
   def usage
@@ -113,10 +124,8 @@ class Robut::Plugin::Rdio
   # the web player. It can be an artist, album, or song.
   def handle(time, sender_nick, message)
     
-    Server.reply_callback ||= lambda{|message| reply(message, :room)}
-    Server.state_callback ||= lambda{|message| reply("/me #{message}", :room)}
+    establish_server_callbacks!
     
-    ::Rdio.init(self.class.key, self.class.secret)
     words = words(message)
     
     if sent_to_me?(message)
@@ -229,6 +238,7 @@ class Robut::Plugin::Rdio
   #
   #
   def search(words)
+    ::Rdio.init(self.class.key, self.class.secret)
     api = ::Rdio::Api.new(self.class.key, self.class.secret)
     words = words.split(' ')
     
