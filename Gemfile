@@ -18,6 +18,7 @@ group :development do
   gem 'highline'
   gem 'guard'
   gem 'guard-rspec'
+  gem 'ruby-debug19', :require => 'ruby-debug'
 end
 
 group :test do
