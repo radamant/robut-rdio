@@ -76,7 +76,7 @@ class Robut::Plugin::Rdio
   # @return [Boolean]
   #
   def play_results_regex
-    /^(?:play)?\s?(?:result)?\s?((?:\d[\s,-]*)+)$/
+    /^(?:play)?\s?(?:result)?\s?((?:\d[\s,-]*)+|all)$/
   end
   
   #
@@ -100,12 +100,17 @@ class Robut::Plugin::Rdio
   #     "play 1,2"
   #     "play 1-3"
   #     "play 1, 2 4-6"
+  #     "play all"
   #
   def parse_tracks_to_play(track_request)
-    Array(track_request).join(' ')[play_results_regex,-1].to_s.split(/(?:\s|,\s?)/).map do |track| 
-      tracks = track.split("-")
-      (tracks.first.to_i..tracks.last.to_i).to_a
-    end.flatten
+    if Array(track_request).join(' ') =~ /play all/
+      [ 'all' ]
+    else
+      Array(track_request).join(' ')[play_results_regex,-1].to_s.split(/(?:\s|,\s?)/).map do |track| 
+        tracks = track.split("-")
+        (tracks.first.to_i..tracks.last.to_i).to_a
+      end.flatten
+    end
   end
 
   #
@@ -230,6 +235,15 @@ class Robut::Plugin::Rdio
     
     if !has_results?
       reply("I don't have any search results") and return
+    end
+    
+    requests = requests.flatten.compact
+    
+    # Queue all the songs when the request is 'all'
+    
+    if requests.first == "all"
+      results.length.times {|index| queue result_at(index) }
+      return
     end
     
     requests.flatten.each do |request|

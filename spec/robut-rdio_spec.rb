@@ -47,7 +47,9 @@ describe Robut::Plugin::Rdio do
           "play 1, 2, 3",
           "play 1 2 3",
           "play 1 - 3",
-          "play 1-3"
+          "play 1-3",
+          # all tracks
+          "play all"
         ]
       end
 
