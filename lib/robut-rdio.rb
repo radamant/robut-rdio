@@ -202,7 +202,8 @@ class Robut::Plugin::Rdio
   private
   RESULT_DISPLAYER = {
     ::Rdio::Album => lambda{|album| "#{album.artist.name} - #{album.name}"},
-    ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"}
+    ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"},
+    ::Rdio::Artist => lambda{|artist| "#{artist.name} - #{artist.tracks.sample.name}"}
   }
 
   def run_command(command)
@@ -299,7 +300,7 @@ class Robut::Plugin::Rdio
     elsif words.first == "artist"
       query_string = words[1..-1].join(' ')
       results = api.search(query_string, "Artist")
-   else
+    else
       query_string = words.join(' ')
       results = api.search(query_string, "Track")
     end
