@@ -9,6 +9,13 @@ end
 
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../../lib')
 
-require 'test/unit/assertions'
+require 'rspec/expectations'
+require 'cucumber/rspec/doubles'
 
-World(Test::Unit::Assertions)
+module RdioApiStub
+  def rdio_api
+    @rdio_api ||= double
+  end
+end
+
+World(RdioApiStub)

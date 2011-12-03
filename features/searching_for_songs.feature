@@ -11,7 +11,7 @@ Given The following songs match the rdio search "take five":
  | 1 | Take Five Fingers | Brave Dubeck Fartet | Rhyme Out|
 
 When I type the following into the chat room:
- |@dj find take five|
+ | @dj find take five |
 
 Then I should see the following song titles in the search result:
  | index | song |
@@ -19,7 +19,7 @@ Then I should see the following song titles in the search result:
  | 1     | Take Five Fingers |
 
 When I type the following into the chat room:
- |@dj play 1|
+ | @dj play 1 |
 
 Then the song "Take Five" should be queued
 
