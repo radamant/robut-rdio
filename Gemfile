@@ -12,14 +12,15 @@ gem 'thin'
 
 group :development do
   gem "rspec"
+  gem 'cucumber'
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.6.4"
   gem "rcov", ">= 0"
   gem 'highline'
   gem 'guard'
+  gem 'guard-cucumber'
   gem 'guard-rspec'
   gem 'ruby-debug19', :require => 'ruby-debug'
-  gem 'cucumber'
 end
 
 group :test do
