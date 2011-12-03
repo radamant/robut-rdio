@@ -45,6 +45,17 @@ class Robut::Plugin::Rdio
     Server.token = self.token || "GAlNi78J_____zlyYWs5ZG02N2pkaHlhcWsyOWJtYjkyN2xvY2FsaG9zdEbwl7EHvbylWSWFWYMZwfc="
     Server.domain = self.domain || "localhost"
   end
+  
+  #
+  # Because an instance of this plugin is not created until the Robut client has
+  # recieved at least one message. The server callbacks need to be created during
+  # the #handle request. This allows for the server to communicate back through
+  # the Robut communication channel that it receives the messages.
+  # 
+  def establish_server_callbacks!
+    Server.reply_callback ||= lambda{|message| reply(message, :room)}
+    Server.state_callback ||= lambda{|message| reply("/me #{message}", :room)}
+  end
 
   # Returns a description of how to use this plugin
   def usage
@@ -59,26 +70,86 @@ class Robut::Plugin::Rdio
     ]
   end
  
+  
+  #
+  # @param [String,Array] request that is being evaluated as a play request
+  # @return [Boolean]
+  #
+  def play_results_regex
+    /^(?:play)?\s?(?:result)?\s?((?:\d[\s,-]*)+|all)$/
+  end
+  
+  #
+  # @param [String,Array] request that is being evaluated as a play request
+  # @return [Boolean]
+  #
   def play?(request)
-    Array(request).join(' ') =~ /^(play)?\s?(result)?\s?\d/
+    Array(request).join(' ') =~ play_results_regex
   end
 
+  #
+  # @param [Array,String] track_request the play request that is going to be 
+  #   parsed for available tracks.
+  # 
+  # @return [Array] track numbers that were identified.
+  # 
+  # @example Requesting multiple tracks
+  # 
+  #     "play 1"
+  #     "play 1 2"
+  #     "play 1,2"
+  #     "play 1-3"
+  #     "play 1, 2 4-6"
+  #     "play all"
+  #
+  def parse_tracks_to_play(track_request)
+    if Array(track_request).join(' ') =~ /play all/
+      [ 'all' ]
+    else
+      Array(track_request).join(' ')[play_results_regex,-1].to_s.split(/(?:\s|,\s?)/).map do |track| 
+        tracks = track.split("-")
+        (tracks.first.to_i..tracks.last.to_i).to_a
+      end.flatten
+    end
+  end
+
+  #
+  # @return [Regex] that is used to match searches for their parameters
+  # @see http://rubular.com/?regex=(find%7Cdo%20you%20have(%5Csany)%3F)%5Cs%3F(.%2B%5B%5E%3F%5D)%5C%3F%3F
+  # 
   def search_regex
     /(find|do you have(\sany)?)\s?(.+[^?])\??/
   end
   
+  #
+  # @param [String,Array] request that is being evaluated as a search request
+  # @return [Boolean]
+  #
   def search?(request)
     Array(request).join(' ') =~ search_regex
   end
 
+  #
+  # @param [String,Array] request that is being evaluated as a search and playback 
+  #   request
+  # @return [Boolean]
+  #
   def search_and_play?(request)
-    Array(request).first == 'play' and Array(request).length > 1
+    Array(request).join(' ') =~ /^play\b[^\b]+/
   end
 
-  def playback?(request)
-    Array(request).first =~ /play|(?:un)?pause|next|restart|back|clear/
+  #
+  # @param [String,Array] request that is being evaluated as a command request
+  # @return [Boolean]
+  #
+  def command?(request)
+    Array(request).join(' ') =~ /^(?:play|(?:un)?pause|next|restart|back|clear)$/
   end
 
+  #
+  # @param [String,Array] request that is being evaluated as a skip album request
+  # @return [Boolean]
+  #
   def skip_album?(message)
     message =~ /(next|skip) album/
   end
@@ -88,26 +159,22 @@ class Robut::Plugin::Rdio
   # the web player. It can be an artist, album, or song.
   def handle(time, sender_nick, message)
     
-    Server.reply_callback ||= lambda{|message| reply(message, :room)}
-    Server.state_callback ||= lambda{|message| reply("/me #{message}", :room)}
+    establish_server_callbacks!
     
-    ::Rdio.init(self.class.key, self.class.secret)
     words = words(message)
     
     if sent_to_me?(message)
-      
+
       if play?(words)
-        
-        play_result(words.last.to_i)
+
+        play_result *parse_tracks_to_play(words)
         
       elsif search_and_play?(words)
         
-        results = search(message)
-        result = results.first
-        if result
-          queue(result)
-        else
-          reply("I couldn't find #{words.join(" ")} on Rdio.")
+        search_and_play_criteria = words[1..-1].join(" ")
+        
+        unless search_and_play_result search_and_play_criteria
+          reply("I couldn't find '#{search_and_play_criteria}' on Rdio.")
         end
         
       elsif search?(words)
@@ -118,9 +185,9 @@ class Robut::Plugin::Rdio
 
         run_command("next_album")
 
-      else playback?(words)
+      else command?(words)
         
-        run_command(words.first)
+        run_command(words.join("_"))
         
       end
       
@@ -128,6 +195,11 @@ class Robut::Plugin::Rdio
     
   end
 
+  #
+  # As the plugin is initialized each time a request is made, the plugin maintains
+  # the state of the results from the last search request to ensure that it will
+  # be available when someone makes another request.
+  # 
   def results
     @@results
   end
@@ -135,7 +207,8 @@ class Robut::Plugin::Rdio
   private
   RESULT_DISPLAYER = {
     ::Rdio::Album => lambda{|album| "#{album.artist.name} - #{album.name}"},
-    ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"}
+    ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"},
+    ::Rdio::Artist => lambda{|artist| "#{artist.name} - #{artist.tracks.sample.name}"}
   }
 
   def run_command(command)
@@ -158,16 +231,40 @@ class Robut::Plugin::Rdio
     result_display
   end
 
-  def play_result(number)
+  def play_result(*requests)
+    
     if !has_results?
       reply("I don't have any search results") and return
     end
-
-    if !has_result?(number)
-      reply("I don't have that result") and return
+    
+    requests = requests.flatten.compact
+    
+    # Queue all the songs when the request is 'all'
+    
+    if requests.first == "all"
+      results.length.times {|index| queue result_at(index) }
+      return
     end
-
-    queue result_at(number)
+    
+    requests.flatten.each do |request|
+      
+      if has_result?(request.to_i)
+        queue result_at(request.to_i)
+      else
+        reply("I don't have that result")
+      end
+      
+    end
+    
+  end
+  
+  def search_and_play_result(message)
+    
+    if result = Array(search(message)).first
+      queue(result)
+      true
+    end
+    
   end
 
   def has_results?
@@ -204,6 +301,7 @@ class Robut::Plugin::Rdio
   #
   #
   def search(words)
+    ::Rdio.init(self.class.key, self.class.secret)
     api = ::Rdio::Api.new(self.class.key, self.class.secret)
     words = words.split(' ')
     
@@ -216,7 +314,7 @@ class Robut::Plugin::Rdio
     elsif words.first == "artist"
       query_string = words[1..-1].join(' ')
       results = api.search(query_string, "Artist")
-   else
+    else
       query_string = words.join(' ')
       results = api.search(query_string, "Track")
     end

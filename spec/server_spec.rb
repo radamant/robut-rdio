@@ -14,10 +14,10 @@ describe Robut::Plugin::Rdio::Server do
   end
 
   it 'should be able to tell HipChat what song is playing' do
-    Robut::Plugin::Rdio::Server.reply_callback = lambda{ |message| @message = message }
+    Robut::Plugin::Rdio::Server.state_callback = lambda{ |message| @message = message }
     get '/now_playing/The%20National%20-%20Bloodbuzz%20Ohio'
     last_response.should be_ok
-    @message.should == 'Now playing: The National - Bloodbuzz Ohio'
+    @message.should == 'is now playing: The National - Bloodbuzz Ohio'
   end
 
   it 'should degrade gracefully if a reply_callback has not been defined' do

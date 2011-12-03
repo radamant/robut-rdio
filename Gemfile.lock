@@ -9,6 +9,8 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
+    archive-tar-minitar (0.5.2)
+    columnize (0.3.5)
     builder (3.0.0)
     cucumber (1.1.3)
       builder (>= 2.1.2)
@@ -31,6 +33,8 @@ GEM
       bundler (~> 1.0)
       git (>= 1.2.5)
       rake
+    linecache19 (0.5.12)
+      ruby_core_source (>= 0.1.4)
     json (1.6.2)
     oauth (0.4.5)
     rack (1.3.5)
@@ -50,6 +54,16 @@ GEM
     rspec-expectations (2.7.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.7.0)
+    ruby-debug-base19 (0.11.25)
+      columnize (>= 0.3.1)
+      linecache19 (>= 0.5.11)
+      ruby_core_source (>= 0.1.4)
+    ruby-debug19 (0.11.6)
+      columnize (>= 0.3.1)
+      linecache19 (>= 0.5.11)
+      ruby-debug-base19 (>= 0.11.19)
+    ruby_core_source (0.1.5)
+      archive-tar-minitar (>= 0.5.2)
     sinatra (1.3.1)
       rack (~> 1.3, >= 1.3.4)
       rack-protection (~> 1.1, >= 1.1.2)
@@ -78,5 +92,6 @@ DEPENDENCIES
   rdio (= 0.0.91)
   robut!
   rspec
+  ruby-debug19
   sinatra
   thin
