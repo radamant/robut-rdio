@@ -223,7 +223,7 @@ describe Robut::Plugin::Rdio do
         let(:message) { "skip album @dj" }
         
         it_should_behave_like "a successfully routed action",
-          :route => :skip_album?, :action => :run_command, :parameters => "next_album"
+          :route => :skip_album?, :action => :send_server_command, :parameters => "next_album"
         
       end
       
@@ -232,12 +232,11 @@ describe Robut::Plugin::Rdio do
         let(:message) { "@dj pause" }
         
         it_should_behave_like "a successfully routed action",
-          :route => :command?, :action => :run_command, :parameters => "pause"
+          :route => :command?, :action => :send_server_command, :parameters => "pause"
         
       end
       
     end
-    
     
   end
   

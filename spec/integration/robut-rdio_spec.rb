@@ -9,7 +9,9 @@ describe "RobutRdio Super Integration Test" do
     def plugin.nick
       "dj"
     end
-
+    
+    plugin.stub(:store){ Hash.new }
+    
     plugin.stub(:reply){ |msg| @reply = msg }
 
     plugin
@@ -28,12 +30,12 @@ describe "RobutRdio Super Integration Test" do
 
     it 'should make an rdio search' do
       stub_search('neil young', ['harvest', 'after the gold rush'])
-      say('@dj find neil young')
+      say '@dj find neil young'
       @reply.should == "result: harvest\nresult: after the gold rush\n"
     end
 
     def stub_search(mock_query, results)
-      plugin.stub(:search).with(mock_query) { results }
+      plugin.stub(:search).with(mock_query) { Robut::Plugin::Rdio::SearchResult.new "me", results }
       results.each do |result|
         plugin.stub(:format_result).with(result, anything()) { "result: #{result}" }
       end
@@ -46,18 +48,18 @@ describe "RobutRdio Super Integration Test" do
 
     describe 'when there is a search result' do
       before do
-        plugin.stub(:result_at) { |i| i.to_s }
+        plugin.stub(:results) { [ 0000, 1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888 ] }
         plugin.stub(:queue) { |result| @queued = result }
-        plugin.stub(:has_results?) { true }
-        plugin.stub(:has_result?) { true }
+        # plugin.stub(:has_results?) { true }
+        # plugin.stub(:has_result?) { true }
       end
 
       it 'should queue the track at the given position with "play <number>"' do
         say '@dj play 1'
-        @queued.should == '1'
+        @queued.should == [1111]
 
         say '@dj 8'
-        @queued.should == '8'
+        @queued.should == [8888]
       end
 
     end
@@ -73,24 +75,11 @@ describe "RobutRdio Super Integration Test" do
       end
     end
 
-    describe 'when there are results but not at the requested index' do
-      before do
-        plugin.stub(:has_results?) { true }
-        plugin.stub(:has_result?).with(5) { false }
-      end
-      it 'should say the result does not exist' do
-        say '@dj play 5'
-        @reply.should == "I don't have that result"
-      end
-    end
   end
 
-  describe "I'm feeling lucky play/search" do
-  
-  end
   describe 'running commands' do
     before do
-      plugin.stub(:run_command) { |command| @command = command }
+      plugin.stub(:send_server_command) { |command| @command = command }
     end
 
     %w{play unpause pause next restart back clear}.each do |command|
@@ -103,7 +92,7 @@ describe "RobutRdio Super Integration Test" do
 
   describe 'skipping an album' do
     before do
-      plugin.stub(:run_command) { |command| @command = command }
+      plugin.stub(:send_server_command) { |command| @command = command }
     end
     it "should run next_album for `next album`" do
       say("@dj next album")

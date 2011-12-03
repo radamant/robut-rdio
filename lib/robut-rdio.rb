@@ -2,6 +2,9 @@ require 'robut'
 require_relative 'server/server'
 require 'rdio'
 
+require_relative 'search_result'
+require_relative 'query_parser'
+
 # A plugin that hooks into Rdio, allowing you to queue songs from
 # HipChat. +key+ and +secret+ must be set before we can deal with any
 # Rdio commands. Additionally, you must call +start_server+ in your
@@ -62,6 +65,7 @@ class Robut::Plugin::Rdio
     [
       "#{at_nick} play <song> - queues <song> for playing",
       "#{at_nick} play album <album> - queues <album> for playing",
+      "#{at_nick} play artist <artist> - queues <artist> for playing",
       "#{at_nick} play track <track> - queues <track> for playing",
       "#{at_nick} play/unpause - unpauses the track that is currently playing",
       "#{at_nick} next - move to the next track",
@@ -154,10 +158,34 @@ class Robut::Plugin::Rdio
     message =~ /(next|skip) album/
   end
   
-  # Queues songs into the Rdio web player. @nick play search query
-  # will queue the first search result matching 'search query' into
-  # the web player. It can be an artist, album, or song.
+  def sender_nick
+    @sender_nick
+  end
+  
+  def sender_nick_short
+    @sender_nick.split(' ').first
+  end
+  
+  def message
+    @message
+  end
+  
+  def time
+    @time
+  end
+  
+  #
+  # This method is called by Robut when a new message has been added to the 
+  # chatroom.
+  # 
+  # @param [Time] time that the message arrived
+  # @param [String] sender_nick is the user that sent the message
+  # @param [String] message that the user has sent
+  #
   def handle(time, sender_nick, message)
+    @time = time
+    @sender_nick = sender_nick
+    @message = message
     
     establish_server_callbacks!
     
@@ -174,25 +202,30 @@ class Robut::Plugin::Rdio
         search_and_play_criteria = words[1..-1].join(" ")
         
         unless search_and_play_result search_and_play_criteria
-          reply("I couldn't find '#{search_and_play_criteria}' on Rdio.")
+          reply "I couldn't find '#{search_and_play_criteria}' on Rdio."
         end
         
       elsif search?(words)
         
         find words.join(' ')[search_regex,-1]
+        save_results
+        reply_with_results_for_queueing
+        
       
       elsif skip_album?(message)
 
-        run_command("next_album")
+        send_server_command("next_album")
 
       else command?(words)
         
-        run_command(words.join("_"))
+        send_server_command(words.join("_"))
         
       end
       
     end
     
+  rescue => exception
+    reply "#{exception} #{exception.backtrace}"
   end
 
   #
@@ -200,40 +233,59 @@ class Robut::Plugin::Rdio
   # the state of the results from the last search request to ensure that it will
   # be available when someone makes another request.
   # 
+  # @return [SearchResult] the results for the current sender if present and not
+  #   too old; defaults to the last result set for any user.
+  # 
   def results
-    @@results
+    @@results = {} unless defined? @@results
+    
+    results_for_sender = @@results[sender_nick]
+    
+    if results_for_sender and results_for_sender.are_not_old?(time)
+      results_for_sender
+    else
+      @@results["LAST_RESULSET"]
+    end
+    
   end
-
+  
   private
-  RESULT_DISPLAYER = {
-    ::Rdio::Album => lambda{|album| "#{album.artist.name} - #{album.name}"},
-    ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"},
-    ::Rdio::Artist => lambda{|artist| "#{artist.name} - #{artist.tracks.sample.name}"}
-  }
 
-  def run_command(command)
+  def send_server_command(command)
     Server.command << command
   end
 
-  def find(query)
-    reply("Searching for: #{query}...")
-    @@results = search(query)
+  #
+  # @param [String] query the search criteria to use to find and then queue
+  #   up.
+  # 
+  def find(query_string)
+    query = QueryParser.parse query_string
+    query_type = query.type || default_type_of_query
 
-    result_display = format_results(@@results)
-    reply(result_display)
+    reply "/me is searching for #{query.type.to_s[0] == 'a' ? 'an' : 'a'} #{query_type} with '#{query.terms}'..."
+    @search_results = search(query_string)
   end
-
-  def format_results(results)
-    result_display = ""
-    results.each_with_index do |result, index|
-      result_display += format_result(result, index) + "\n"
-    end
-    result_display
+  
+  def reply_with_results_for_queueing
+    reply "@#{sender_nick_short} I found the following:\n#{format_results_for_queueing(@search_results.results)}"
+  end
+  
+  #
+  # Store the current results for the user and set them as the last resultset
+  # so that users with expired results or no results with use someone else's
+  # results.
+  # 
+  def save_results
+    @@results = {} unless defined? @@results
+    
+    @@results[@search_results.owner] = @search_results
+    @@results["LAST_RESULSET"] = @search_results
   end
 
   def play_result(*requests)
     
-    if !has_results?
+    unless results
       reply("I don't have any search results") and return
     end
     
@@ -242,57 +294,116 @@ class Robut::Plugin::Rdio
     # Queue all the songs when the request is 'all'
     
     if requests.first == "all"
-      results.length.times {|index| queue result_at(index) }
-      return
+      queue(results.results) and return
     end
     
-    requests.flatten.each do |request|
-      
-      if has_result?(request.to_i)
-        queue result_at(request.to_i)
-      else
-        reply("I don't have that result")
-      end
-      
-    end
+    queue requests.flatten.map {|request| results[request] }.flatten
     
   end
   
-  def search_and_play_result(message)
+  #
+  # @param [String] message the search criteria to use to find and then queue
+  #   up.
+  #
+  def search_and_play_result(query)
     
-    if result = Array(search(message)).first
-      queue(result)
+    search_results = search(query)
+    
+    if search_results and search_results.results
+      queue(search_results.results.first)
       true
     end
     
   end
 
-  def has_results?
-    @@results && @@results.any?
+  #
+  # Enqueues the tracks specified and replies to the chatroom with the songs 
+  # that have been enqueued.
+  # 
+  # @param [Result,Results] results is a result or results that you want to 
+  #   enqueue.
+  #
+  def queue(results)
+    
+    # Queue the songs, while collecting, human-readable forms of the queued songs
+    
+    queued_songs = Array(results).map do |result|
+      Server.queue << result.key
+      format_result(result)
+    end
+    
+    # If the user has requested 2 songs then show those songs, 
+    # otherwise show the first song and the number of songs that were queued
+    
+    if queued_songs.length < 3
+      queued_songs.each {|song| reply "/me queued '#{song}'" }
+    else
+      reply "/me queued '#{queued_songs.first}' and #{queued_songs.length - 1} other songs"
+    end
+    
+  end
+  
+  #
+  # Formats the results for the purposes of displaying back to the user in an
+  # ordered list with prefix index to allow the user an easy way to later enqueue
+  # the tracks for playing.
+  # 
+  # @param [Result,Results] results a result or results that you want to display
+  #   with prefixed indexes.
+  #
+  def format_results_for_queueing(results)
+    Array(results).each_with_index.map do |result, index|
+      "#{index} #{format_result(result)}"
+    end.join("\n")
   end
 
-  def has_result?(number)
-    !@@results[number].nil?
+  #
+  # @param [Result] search_result an Rdio object that will be displayed
+  #
+  def format_result(search_result)
+    
+    unless defined? @@result_displayer and @@result_displayer
+      
+      @@result_displayer = {
+        ::Rdio::Album => lambda{|album| "#{album.artist.name} - #{album.name}"},
+        ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"},
+        ::Rdio::Artist => lambda{|artist| "#{artist.name} - #{artist.tracks.sample.name}"}
+      }
+      
+      fallback_display = lambda{|object| object.to_s }
+      @@result_displayer.default fallback_display
+    
+    end
+    
+    @@result_displayer[search_result.class].call(search_result)
   end
-
-  def result_at(number)
-    @@results[number]
+  
+  #
+  # @param [String] query to search through the services to find the results
+  # @return [SearchResult] that is associated with the current user and contains
+  #   the set of results for the users's query.
+  # 
+  def search(query_string)
+    
+    # As this is only an rdio-pluin we will simply search Rdio and return the
+    # results from that search operation.
+    
+    query = QueryParser.parse query_string
+    query_type = query.type || default_type_of_query
+    
+    results = search_rdio query.terms, query_type.to_s.capitalize
+    
+    SearchResult.new sender_nick, results
   end
-
-  def queue(result)
-    Server.queue << result.key
-    name = result.name
-    name = "#{result.artist_name} - #{name}" if result.respond_to?(:artist_name) && result.artist_name
-    reply("Queuing: #{name}")
+  
+  #
+  # When a query does not contain a type of query it will default to this value
+  # for the user.
+  # 
+  def default_type_of_query
+    store["#{self.class.name}::query::type::#{sender_nick}"] || :track
   end
-
-
-  def format_result(search_result, index)
-    response = RESULT_DISPLAYER[search_result.class].call(search_result)
-    puts response
-    "#{index}: #{response}"
-  end
-
+    
   # Searches Rdio for sources matching +words+. 
   # 
   # Given an array of Strings, which are the search terms, use Rdio to find any
@@ -300,24 +411,12 @@ class Robut::Plugin::Rdio
   # albums that match the criteria.
   #
   #
-  def search(words)
-    ::Rdio.init(self.class.key, self.class.secret)
-    api = ::Rdio::Api.new(self.class.key, self.class.secret)
-    words = words.split(' ')
-    
-    if words.first == "album"
-      query_string = words[1..-1].join(' ')
-      results = api.search(query_string, "Album")
-    elsif words.first == "track"
-      query_string = words[1..-1].join(' ')
-      results = api.search(query_string, "Track")
-    elsif words.first == "artist"
-      query_string = words[1..-1].join(' ')
-      results = api.search(query_string, "Artist")
-    else
-      query_string = words.join(' ')
-      results = api.search(query_string, "Track")
-    end
+  # @param [String] query the query string
+  # @param [String] filters the areas to filter the data (i.e. Artist, Track, Album)
+  #
+  def search_rdio(query,filters)
+    api = ::Rdio.init(self.class.key, self.class.secret)
+    api.search(query,filters)
   end
 
 end
