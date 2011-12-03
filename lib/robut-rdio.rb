@@ -353,7 +353,7 @@ class Robut::Plugin::Rdio
   #
   def format_results_for_queueing(results)
     Array(results).each_with_index.map do |result, index|
-      "#{index} #{format_result(result)}"
+      "#{index}: #{format_result(result)}"
     end.join("\n")
   end
 

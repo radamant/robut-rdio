@@ -31,13 +31,15 @@ describe "RobutRdio Super Integration Test" do
     it 'should make an rdio search' do
       stub_search('neil young', ['harvest', 'after the gold rush'])
       say '@dj find neil young'
-      @reply.should == "result: harvest\nresult: after the gold rush\n"
+      @reply.should == "@foo I found the following:\n0: harvest\n1: after the gold rush"
     end
 
     def stub_search(mock_query, results)
-      plugin.stub(:search).with(mock_query) { Robut::Plugin::Rdio::SearchResult.new "me", results }
+      plugin.stub(:search).with(mock_query) do 
+        Robut::Plugin::Rdio::SearchResult.new "foo", results
+      end
       results.each do |result|
-        plugin.stub(:format_result).with(result, anything()) { "result: #{result}" }
+        plugin.stub(:format_result).with(result) { result }
       end
     end
 
@@ -48,7 +50,7 @@ describe "RobutRdio Super Integration Test" do
 
     describe 'when there is a search result' do
       before do
-        plugin.stub(:results) { [ 0000, 1111, 2222, 3333, 4444, 5555, 6666, 7777, 8888 ] }
+        plugin.stub(:results) { [ 0000, 1111, 2222, 3333, 4444, 5555, 6666, 7777 ] }
         plugin.stub(:queue) { |result| @queued = result }
         # plugin.stub(:has_results?) { true }
         # plugin.stub(:has_result?) { true }
@@ -58,15 +60,15 @@ describe "RobutRdio Super Integration Test" do
         say '@dj play 1'
         @queued.should == [1111]
 
-        say '@dj 8'
-        @queued.should == [8888]
+        say '@dj 4'
+        @queued.should == [4444]
       end
 
     end
 
     describe 'when there are no search results' do
       before do
-        plugin.stub(:has_results?) { false }
+        plugin.stub(:results) { nil }
       end
 
       it 'should say there are no results' do
