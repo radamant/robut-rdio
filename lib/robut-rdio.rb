@@ -4,6 +4,8 @@ require 'rdio'
 
 require_relative 'search_result'
 require_relative 'query_parser'
+require_relative 'actions/actions'
+require_relative 'actions/show_queue'
 
 # A plugin that hooks into Rdio, allowing you to queue songs from
 # HipChat. +key+ and +secret+ must be set before we can deal with any
@@ -59,6 +61,17 @@ class Robut::Plugin::Rdio
     Server.reply_callback ||= lambda{|message| reply(message, :room)}
     Server.state_callback ||= lambda{|message| reply("/me #{message}", :room)}
     Server.update_queue ||= lambda{|queue| save_song_queue queue }
+    
+  end
+  
+  def actions
+    unless defined? @@actions
+      reply_lambda = lambda{|message| reply(message, :room)}
+      
+      @@actions = Actions.new ShowQueueAction.new(reply_lambda, song_queue)
+    end
+    
+    @@actions
   end
 
   # Returns a description of how to use this plugin
@@ -156,14 +169,6 @@ class Robut::Plugin::Rdio
   end
   
   #
-  # @param [String,Array] request that is being evaluated as a show queue
-  #   request
-  #
-  def show_queue?(request)
-    Array(request).join(' ') =~ /^show queue$/
-  end
-  
-  #
   # @param [String,Array] request that is being evaluated as a command request
   # @return [Boolean]
   #
@@ -237,10 +242,6 @@ class Robut::Plugin::Rdio
         
         show_more_results words.join(' ')[show_more_regex,-1]
         save_results
-    
-      elsif show_queue?(words)
-      
-        reply_with_queue
       
       elsif show_results?(words)
       
@@ -251,11 +252,14 @@ class Robut::Plugin::Rdio
 
         send_server_command("next_album")
 
-      else command?(words)
+      elsif command?(words)
         
         send_server_command(words.join("_"))
         
       end
+      
+      meaningful_message = words.join(' ')
+      actions.action_for(meaningful_message).handle(time,sender_nick,meaningful_message)
       
     end
     
@@ -290,7 +294,12 @@ class Robut::Plugin::Rdio
   end
   
   def save_song_queue(queue)
-    @@queue = queue
+    @@queue = [] unless defined? @@queue
+    @@queue.clear
+    Array(queue).each do |song|
+      @@queue << song
+    end
+    
   end
   
   private
@@ -313,14 +322,6 @@ class Robut::Plugin::Rdio
   
   def reply_with_results_for_queueing
     reply "@#{sender_nick_short} I found the following:\n#{format_results_for_queueing(@search_results.results)}"
-  end
-  
-  def reply_with_queue
-    formatted_queue_data = Array(song_queue).map do |song|
-      "#{song["artist"]} - #{song["album"]} - #{song["track"]}"
-    end.join("\n")
-    
-    reply "@#{sender_nick_short} the queue is currently:\n#{formatted_queue_data}"
   end
   
   #
