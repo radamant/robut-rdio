@@ -28,41 +28,7 @@ describe Robut::Plugin::Rdio do
   end
   
   describe "Routing Methods" do 
-    
-    describe "#play?", :method => :play? do
-      
-      it_should_behave_like "a routing method"
-
-      let(:valid_requests) do
-        [ 
-          # play keyword
-          "play 0",
-          "play 999999", 
-          [ "play", "0" ], 
-          # result keyword
-          "result1", 
-          "result 1", 
-          [ "result 0"],
-          # multiple tracks
-          "play 1, 2, 3",
-          "play 1 2 3",
-          "play 1 - 3",
-          "play 1-3",
-          # all tracks
-          "play all"
-        ]
-      end
-
-      let(:invalid_requests) do
-        [ 
-          "play Abba", 
-          "play ",
-          [ "play", "three-eleven" ]
-        ]
-      end
-
-    end
-    
+ 
     describe "search?", :method => :search? do
       
       it_should_behave_like "a routing method"

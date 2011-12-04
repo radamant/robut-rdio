@@ -1,4 +1,4 @@
-require_relative '../spec_helper'
+require_relative 'spec_helper'
 
 describe ShowQueueAction do
   
@@ -8,7 +8,7 @@ describe ShowQueueAction do
     
     it "should return a single example or list of examples" do
       examples = subject.examples
-      (examples.class == String || examples.class == Enumerable).should be_true
+      (examples.class == String || examples.class == Array).should be_true
     end
 
   end
@@ -77,8 +77,6 @@ describe ShowQueueAction do
       end
 
     end
-
-    
 
   end
   

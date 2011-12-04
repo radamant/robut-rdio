@@ -5,7 +5,9 @@ require 'rdio'
 require_relative 'search_result'
 require_relative 'query_parser'
 require_relative 'actions/actions'
+require_relative 'actions/play_results_action'
 require_relative 'actions/show_queue_action'
+
 
 # A plugin that hooks into Rdio, allowing you to queue songs from
 # HipChat. +key+ and +secret+ must be set before we can deal with any
@@ -67,8 +69,10 @@ class Robut::Plugin::Rdio
   def actions
     unless defined? @@actions
       reply_lambda = lambda{|message| reply(message, :room)}
+      queue_lambda = lambda{|tracks| queue(tracks) }
       
-      @@actions = Actions.new ShowQueueAction.new(reply_lambda, song_queue)
+      @@actions = Actions.new PlayResultsAction.new(reply_lambda, queue_lambda, results),
+        ShowQueueAction.new(reply_lambda, song_queue)
     end
     
     @@actions
@@ -86,40 +90,6 @@ class Robut::Plugin::Rdio
       "#{at_nick} next|skip album - skip all tracks in the current album group",
       "#{at_nick} restart - restart the current track"
     ]
-  end
- 
-  
-  #
-  # @param [String,Array] request that is being evaluated as a play request
-  # @return [Boolean]
-  #
-  def play_results_regex
-    /^(?:play)?\s?(?:result)?\s?((?:\d[\s,-]*)+|all)$/
-  end
-  
-  #
-  # @param [String,Array] request that is being evaluated as a play request
-  # @return [Boolean]
-  #
-  def play?(request)
-    Array(request).join(' ') =~ play_results_regex
-  end
-
-  #
-  # @param [Array,String] track_request the play request that is going to be 
-  #   parsed for available tracks.
-  # 
-  # @return [Array] track numbers that were identified.
-  # 
-  def parse_tracks_to_play(track_request)
-    if Array(track_request).join(' ') =~ /play all/
-      [ 'all' ]
-    else
-      Array(track_request).join(' ')[play_results_regex,-1].to_s.split(/(?:\s|,\s?)/).map do |track| 
-        tracks = track.split("-")
-        (tracks.first.to_i..tracks.last.to_i).to_a
-      end.flatten
-    end
   end
 
   #
@@ -220,11 +190,7 @@ class Robut::Plugin::Rdio
     
     if sent_to_me?(message)
 
-      if play?(words)
-
-        play_result *parse_tracks_to_play(words)
-        
-      elsif search_and_play?(words)
+      if search_and_play?(words)
         
         search_and_play_criteria = words[1..-1].join(" ")
         
@@ -235,7 +201,7 @@ class Robut::Plugin::Rdio
       elsif search?(words)
         
         find words.join(' ')[search_regex,-1]
-        save_results
+        save_results(@search_results)
         reply_with_results_for_queueing
         
       elsif show_more?(words)
@@ -272,20 +238,21 @@ class Robut::Plugin::Rdio
   # the state of the results from the last search request to ensure that it will
   # be available when someone makes another request.
   # 
-  # @return [SearchResult] the results for the current sender if present and not
-  #   too old; defaults to the last result set for any user.
-  # 
   def results
     @@results = {} unless defined? @@results
+    @@results
+  end
+  
+  #
+  # Store the current results for the user and set them as the last resultset
+  # so that users with expired results or no results with use someone else's
+  # results.
+  # 
+  def save_results(search_results)
+    @@results = {} unless defined? @@results
     
-    results_for_sender = @@results[sender_nick]
-    
-    if results_for_sender and results_for_sender.are_not_old?(time)
-      results_for_sender
-    else
-      @@results["LAST_RESULSET"]
-    end
-    
+    @@results[search_results.owner] = search_results
+    @@results["LAST_RESULSET"] = search_results
   end
   
   def song_queue
@@ -324,17 +291,7 @@ class Robut::Plugin::Rdio
     reply "@#{sender_nick_short} I found the following:\n#{format_results_for_queueing(@search_results.results)}"
   end
   
-  #
-  # Store the current results for the user and set them as the last resultset
-  # so that users with expired results or no results with use someone else's
-  # results.
-  # 
-  def save_results
-    @@results = {} unless defined? @@results
-    
-    @@results[@search_results.owner] = @search_results
-    @@results["LAST_RESULSET"] = @search_results
-  end
+
 
   def play_result(*requests)
     
@@ -483,7 +440,7 @@ class Robut::Plugin::Rdio
   # @param [String] query the query string
   # @param [String] filters the areas to filter the data (i.e. Artist, Track, Album)
   #
-  def search_rdio(query,filters,start=0,count=10)
+  def search_rdio(query,filters,start=0,count=3)
     api = ::Rdio.init(self.class.key, self.class.secret)
     api.search(query,filters,nil,nil,start,count)
   end
