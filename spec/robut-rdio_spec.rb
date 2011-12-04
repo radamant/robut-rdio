@@ -111,6 +111,31 @@ describe Robut::Plugin::Rdio do
       
     end
     
+    describe "#show_more?", :method => :show_more? do
+
+      it_should_behave_like "a routing method"
+      
+      let(:valid_requests) do
+        [ 
+          "show 5 more results", 
+          "show more results", 
+          [ "show", "more" ], 
+          "show me 5 more", 
+          "show more"
+        ]
+      end
+    
+      let(:invalid_requests) do
+        [ 
+          "show door",
+          "show me the door", 
+          " show me more results",
+          [ "show", "more", "me" ]
+        ]
+      end
+
+    end
+    
     describe "#command?", :method => :command? do
       
       it_should_behave_like "a routing method"
@@ -215,6 +240,15 @@ describe Robut::Plugin::Rdio do
         
         it_should_behave_like "a successfully routed action",
           :route => :search?, :action => :find, :parameters => "the partridge family"
+        
+      end
+      
+      context "when it is a search request" do
+        
+        let(:message) { "@dj show 5 more results" }
+        
+        it_should_behave_like "a successfully routed action",
+          :route => :show_more?, :action => :show_more_results, :parameters => "5"
         
       end
       

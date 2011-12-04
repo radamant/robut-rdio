@@ -141,6 +141,19 @@ class Robut::Plugin::Rdio
   def search_and_play?(request)
     Array(request).join(' ') =~ /^play\b[^\b]+/
   end
+  
+  def show_more_regex
+    /^show(?: me)? ?(\d+)? ?more(?: results)?$/
+  end
+  
+  #
+  # @param [String,Array] request that is being evaluated as a show more results
+  #   request.
+  # @return [Boolean]
+  #
+  def show_more?(request)
+    Array(request).join(' ') =~ show_more_regex
+  end
 
   #
   # @param [String,Array] request that is being evaluated as a command request
@@ -157,6 +170,7 @@ class Robut::Plugin::Rdio
   def skip_album?(message)
     message =~ /(next|skip) album/
   end
+  
   
   def sender_nick
     @sender_nick
@@ -211,7 +225,11 @@ class Robut::Plugin::Rdio
         save_results
         reply_with_results_for_queueing
         
-      
+      elsif show_more?(words)
+        
+        show_more_results words.join(' ')[show_more_regex,-1]
+        save_results
+        
       elsif skip_album?(message)
 
         send_server_command("next_album")
@@ -351,9 +369,9 @@ class Robut::Plugin::Rdio
   # @param [Result,Results] results a result or results that you want to display
   #   with prefixed indexes.
   #
-  def format_results_for_queueing(results)
+  def format_results_for_queueing(results,starting_index=0)
     Array(results).each_with_index.map do |result, index|
-      "#{index}: #{format_result(result)}"
+      "#{starting_index + index}: #{format_result(result)}"
     end.join("\n")
   end
 
@@ -385,7 +403,7 @@ class Robut::Plugin::Rdio
   # 
   def search(query_string)
     
-    # As this is only an rdio-pluin we will simply search Rdio and return the
+    # As this is only an rdio-plugin we will simply search Rdio and return the
     # results from that search operation.
     
     query = QueryParser.parse query_string
@@ -393,7 +411,19 @@ class Robut::Plugin::Rdio
     
     results = search_rdio query.terms, query_type.to_s.capitalize
     
-    SearchResult.new sender_nick, results
+    SearchResult.new sender_nick, results, query.terms, query_type.to_s.capitalize
+  end
+  
+  
+  def show_more_results(count)
+    count = count || default_result_count
+    
+    # append 'count' more results onto the existing result set
+    more_results = search_rdio(results.query,results.filters,results.length + 1,count)
+    
+    reply "@#{sender_nick_short} I found the following:\n#{format_results_for_queueing(more_results,results.length)}"
+    
+    results.append more_results
   end
   
   #
@@ -402,6 +432,10 @@ class Robut::Plugin::Rdio
   # 
   def default_type_of_query
     store["#{self.class.name}::query::type::#{sender_nick}"] || :track
+  end
+  
+  def default_result_count
+    store["#{self.class.name}::query::result_count::#{sender_nick}"] || 10
   end
     
   # Searches Rdio for sources matching +words+. 
@@ -414,9 +448,9 @@ class Robut::Plugin::Rdio
   # @param [String] query the query string
   # @param [String] filters the areas to filter the data (i.e. Artist, Track, Album)
   #
-  def search_rdio(query,filters)
+  def search_rdio(query,filters,start=0,count=10)
     api = ::Rdio.init(self.class.key, self.class.secret)
-    api.search(query,filters)
+    api.search(query,filters,nil,nil,start,count)
   end
 
 end
