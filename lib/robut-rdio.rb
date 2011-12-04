@@ -97,15 +97,6 @@ class Robut::Plugin::Rdio
   # 
   # @return [Array] track numbers that were identified.
   # 
-  # @example Requesting multiple tracks
-  # 
-  #     "play 1"
-  #     "play 1 2"
-  #     "play 1,2"
-  #     "play 1-3"
-  #     "play 1, 2 4-6"
-  #     "play all"
-  #
   def parse_tracks_to_play(track_request)
     if Array(track_request).join(' ') =~ /play all/
       [ 'all' ]
@@ -154,7 +145,15 @@ class Robut::Plugin::Rdio
   def show_more?(request)
     Array(request).join(' ') =~ show_more_regex
   end
-
+  
+  #
+  # @param [String,Array] request that is being evaluated as a show results
+  #   request
+  #
+  def show_results?(request)
+    Array(request).join(' ') =~ /^show(?: me)? ?all(?: results)?$/
+  end
+  
   #
   # @param [String,Array] request that is being evaluated as a command request
   # @return [Boolean]
@@ -230,6 +229,11 @@ class Robut::Plugin::Rdio
         show_more_results words.join(' ')[show_more_regex,-1]
         save_results
         
+      elsif show_results?(words)
+      
+        @search_results = results
+        reply_with_results_for_queueing
+      
       elsif skip_album?(message)
 
         send_server_command("next_album")
