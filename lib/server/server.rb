@@ -42,6 +42,8 @@ class Robut::Plugin::Rdio
       attr_accessor :state_callback
       
       attr_accessor :last_played_track
+      
+      attr_accessor :update_queue
     end
     self.queue = []
     self.command = []
@@ -66,6 +68,12 @@ END
       queue.to_json
     end
     
+    post '/queue.json' do
+      queue = JSON.parse(request.body.read)
+      self.class.update_queue.call queue
+      ""
+    end
+    
     # Returns the command for the player
     get '/command.json' do
       command = self.class.command.dup
@@ -77,6 +85,7 @@ END
     get '/announcement/:message' do
       self.announce! URI.unescape(params[:message].to_s)
     end
+
 
     # Make a now playing announcmenet into the Hipchat channel
     get '/now_playing/:title' do

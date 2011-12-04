@@ -58,6 +58,7 @@ class Robut::Plugin::Rdio
   def establish_server_callbacks!
     Server.reply_callback ||= lambda{|message| reply(message, :room)}
     Server.state_callback ||= lambda{|message| reply("/me #{message}", :room)}
+    Server.update_queue ||= lambda{|queue| save_song_queue queue }
   end
 
   # Returns a description of how to use this plugin
@@ -155,6 +156,14 @@ class Robut::Plugin::Rdio
   end
   
   #
+  # @param [String,Array] request that is being evaluated as a show queue
+  #   request
+  #
+  def show_queue?(request)
+    Array(request).join(' ') =~ /^show queue$/
+  end
+  
+  #
   # @param [String,Array] request that is being evaluated as a command request
   # @return [Boolean]
   #
@@ -228,7 +237,11 @@ class Robut::Plugin::Rdio
         
         show_more_results words.join(' ')[show_more_regex,-1]
         save_results
-        
+    
+      elsif show_queue?(words)
+      
+        reply_with_queue
+      
       elsif show_results?(words)
       
         @search_results = results
@@ -271,6 +284,15 @@ class Robut::Plugin::Rdio
     
   end
   
+  def song_queue
+    @@queue = [] unless defined? @@queue
+    @@queue
+  end
+  
+  def save_song_queue(queue)
+    @@queue = queue
+  end
+  
   private
 
   def send_server_command(command)
@@ -291,6 +313,14 @@ class Robut::Plugin::Rdio
   
   def reply_with_results_for_queueing
     reply "@#{sender_nick_short} I found the following:\n#{format_results_for_queueing(@search_results.results)}"
+  end
+  
+  def reply_with_queue
+    formatted_queue_data = Array(song_queue).map do |song|
+      "#{song["artist"]} - #{song["album"]} - #{song["track"]}"
+    end.join("\n")
+    
+    reply "@#{sender_nick_short} the queue is currently:\n#{formatted_queue_data}"
   end
   
   #
