@@ -5,7 +5,7 @@ require 'rdio'
 require_relative 'search_result'
 require_relative 'query_parser'
 require_relative 'actions/actions'
-require_relative 'actions/show_queue'
+require_relative 'actions/show_queue_action'
 
 # A plugin that hooks into Rdio, allowing you to queue songs from
 # HipChat. +key+ and +secret+ must be set before we can deal with any

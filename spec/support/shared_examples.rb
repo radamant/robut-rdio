@@ -32,6 +32,32 @@ shared_examples "a routing method" do
   
 end
 
+shared_examples "a matching method" do
+
+  context "when given valid messages" do
+
+    it "should return a truthy value" do
+      valid_messages.each do |message|
+        subject.match?(message).should be_true, "expected the message '#{message}' (#{message.class}) to be match"
+      end
+
+    end
+    
+  end
+  
+  context "when given invalid messages" do
+    
+    it "should return a falsy value" do
+      invalid_messages.each do |message|
+        subject.match?(message).should be_false, "expected the message '#{message}' (#{message.class}) to not match"
+      end
+      
+    end
+    
+  end
+  
+end
+
 
 shared_examples "a successfully routed action" do |parameters|
   
