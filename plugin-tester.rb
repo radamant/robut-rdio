@@ -11,6 +11,9 @@ Robut::Plugin::Rdio.start_server
 
 @plugin = Robut::Plugin::Rdio.new(nil)
 
+def @plugin.store
+  @store ||= {}
+end
 
 def @plugin.nick
   return 'dj'
