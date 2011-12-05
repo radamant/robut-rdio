@@ -89,13 +89,16 @@ class PlayResultsAction
   # 
   def parse_tracks_to_play(track_request)
     if Array(track_request).join(' ') =~ /play all/
-      [ 'all' ]
-    else
-      Array(track_request).join(' ')[PLAY_REGEX,-1].to_s.split(/(?:\s|,\s?)/).map do |track| 
-        tracks = track.split("-")
-        (tracks.first.to_i..tracks.last.to_i).to_a
-      end.flatten.uniq.compact
+      return [ 'all' ]
     end
+    
+    # Find all the comma delimited or space delimited numbers and add them to 
+    # an array. When coming across a dash, use that as a range.
+    
+    Array(track_request).join(' ')[PLAY_REGEX,-1].to_s.split(/(?:\s|,\s?)/).map do |track| 
+      tracks = track.split("-")
+      (tracks.first.to_i..tracks.last.to_i).to_a
+    end.flatten.uniq.compact
   end
   
   
@@ -107,6 +110,12 @@ class PlayResultsAction
     end
   end
   
+  #
+  # 1 or 2 tracks will display as normal. More than that number of requests
+  # will show the first one and a count of remaining songs that were enqueued.
+  # 
+  # @param [Array] tracks is the list of tracks to display
+  #
   def display_enqueued_tracks(tracks)
      
     tracks = tracks.map {|track| RdioResultsFormatter.format_result(track) }

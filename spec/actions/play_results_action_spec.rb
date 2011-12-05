@@ -119,8 +119,9 @@ describe PlayResultsAction do
         
         it "should send an empty list of tracks to the queue method" do
           subject.stub(:results_for).and_return(stubbed_results)
+          subject.stub(:display_enqueued_tracks)
           
-          subject.should_receive(:queue).with( [] )
+          subject.should_receive(:queue).with( [2], stubbed_results )
           subject.handle(time,sender,message)
         end
         
@@ -137,8 +138,9 @@ describe PlayResultsAction do
 
         it "should send a list of tracks to the queue method" do
           subject.stub(:results_for).and_return(stubbed_results)
+          subject.stub(:display_enqueued_tracks)
           
-          subject.should_receive(:queue).with( [2] )
+          subject.should_receive(:queue).with( [2], stubbed_results )
           subject.handle(time,sender,message)
         end
 
