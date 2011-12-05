@@ -123,15 +123,13 @@ class Robut::Plugin::Rdio
     
     words = words(message)
     
-    # if sent_to_me?(message)
+    if sent_to_me?(message)
       
       meaningful_message = words.join(' ')
       actions.action_for(meaningful_message).handle(time,sender_nick,meaningful_message)
       
-    # end
+    end
     
-  rescue => exception
-    reply "#{exception} #{exception.backtrace}"
   end
 
   #
