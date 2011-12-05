@@ -36,7 +36,7 @@ describe "RobutRdio Super Integration Test" do
 
     def stub_search(mock_query, results)
       plugin.stub(:search).with(mock_query) do 
-        Robut::Plugin::Rdio::SearchResult.new "foo", results, "neil young", "Artist"
+        Robut::Plugin::Rdio::SearchResult.new "rdio", "foo", results, "neil young", "Artist"
       end
       results.each do |result|
         plugin.stub(:format_result).with(result) { result }

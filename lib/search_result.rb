@@ -2,8 +2,9 @@ class Robut::Plugin::Rdio::SearchResult
   
   attr_reader :owner, :results, :created, :query, :filters
   
-  def initialize owner, results, query, filters, relative_for_seconds = 120
+  def initialize rdio, owner, results, query, filters, relative_for_seconds = 120
     
+    @rdio = rdio
     @owner = owner
     @results = results
     @query = query
@@ -43,9 +44,28 @@ class Robut::Plugin::Rdio::SearchResult
     @results and @results.length > 0
   end
   
+  def all
+    @results
+  end
+  
+  def first
+    @results ? @results.first : nil
+  end
+  
+  def empty?
+    !has_results?
+  end
+  
   def append(new_results)
     @accessed = Time.now
     @results = @results + Array(new_results)
+  end
+  
+  def more!(count)
+    @accessed = Time.now
+    more_results = @rdio.search(query,filters,nil,nil,@results.length + 1,count)
+    @results = @results + more_results
+    more_results
   end
   
 end

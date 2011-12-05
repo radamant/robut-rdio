@@ -1,4 +1,5 @@
 require_relative 'reply_action'
+require_relative '../rdio_results_formatter'
 
 #
 # 
@@ -20,8 +21,8 @@ class PlayResultsAction
   #
   def initialize(reply,queue,search_results)
     @reply = reply
-    @search_results = search_results
     @queue = queue
+    @search_results = search_results
   end
   
   def match?(request)
@@ -55,15 +56,11 @@ class PlayResultsAction
     
     #
     # Queue all the songs when the request is 'all' or the individually
-    # assigned requests.
+    # assigned requests. Then display to the user that they were enqueued.
     #
     
-    if requested_tracks.first == "all"
-      queue results.results
-    else
-      queue requested_tracks.map {|request| results[request] }.compact
-    end
-    
+    display_enqueued_tracks queue(requested_tracks,results)
+   
   end
   
   #
@@ -102,9 +99,24 @@ class PlayResultsAction
   end
   
   
-  def queue(tracks)
-    @queue.call(tracks)
+  def queue(tracks,results)
+    if tracks.first == "all"
+      @queue.enqueue results.all
+    else
+      @queue.enqueue tracks.map {|request| results[request] }.compact
+    end
   end
   
+  def display_enqueued_tracks(tracks)
+     
+    tracks = tracks.map {|track| RdioResultsFormatter.format_result(track) }
+
+    if tracks.length < 3
+      tracks.each {|song| reply "/me queued '#{song}'" }
+    else
+      reply "/me queued '#{tracks.first}' and #{tracks.length - 1} other songs"
+    end
+    
+  end
   
 end

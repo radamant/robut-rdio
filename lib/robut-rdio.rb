@@ -2,11 +2,18 @@ require 'robut'
 require_relative 'server/server'
 require 'rdio'
 
+require_relative 'queue'
 require_relative 'search_result'
 require_relative 'query_parser'
 require_relative 'actions/actions'
+
+require_relative 'actions/find_and_show_results_action'
+require_relative 'actions/find_and_play_action'
 require_relative 'actions/play_results_action'
+require_relative 'actions/find_more_and_show_more_results_action'
+require_relative 'actions/show_results_action'
 require_relative 'actions/show_queue_action'
+require_relative 'actions/control_action'
 
 
 # A plugin that hooks into Rdio, allowing you to queue songs from
@@ -69,10 +76,15 @@ class Robut::Plugin::Rdio
   def actions
     unless defined? @@actions
       reply_lambda = lambda{|message| reply(message, :room)}
-      queue_lambda = lambda{|tracks| queue(tracks) }
+      server_command_lambda = lambda{|command| send_server_command command }
       
-      @@actions = Actions.new PlayResultsAction.new(reply_lambda, queue_lambda, results),
-        ShowQueueAction.new(reply_lambda, song_queue)
+      @@actions = Actions.new PlayResultsAction.new(reply_lambda, song_queue, results),
+        FindAndPlayAction.new(reply_lambda, rdio, song_queue),
+        FindAndShowResultsAction.new(reply_lambda, rdio, results),
+        FindMoreAndShowResultsAction.new(reply_lambda, rdio, results),
+        ShowResultsAction.new(reply_lambda, results),
+        ShowQueueAction.new(reply_lambda, song_queue),
+        ControlAction.new(server_command_lambda)
     end
     
     @@actions
@@ -80,43 +92,9 @@ class Robut::Plugin::Rdio
 
   # Returns a description of how to use this plugin
   def usage
-    [
-      "#{at_nick} play <song> - queues <song> for playing",
-      "#{at_nick} play album <album> - queues <album> for playing",
-      "#{at_nick} play artist <artist> - queues <artist> for playing",
-      "#{at_nick} play track <track> - queues <track> for playing",
-      "#{at_nick} play/unpause - unpauses the track that is currently playing",
-      "#{at_nick} next - move to the next track",
-      "#{at_nick} next|skip album - skip all tracks in the current album group",
-      "#{at_nick} restart - restart the current track"
-    ]
+    # TODO: composed of all the action's examples
   end
 
-  #
-  # @return [Regex] that is used to match searches for their parameters
-  # @see http://rubular.com/?regex=(find%7Cdo%20you%20have(%5Csany)%3F)%5Cs%3F(.%2B%5B%5E%3F%5D)%5C%3F%3F
-  # 
-  def search_regex
-    /(find|do you have(\sany)?)\s?(.+[^?])\??/
-  end
-  
-  #
-  # @param [String,Array] request that is being evaluated as a search request
-  # @return [Boolean]
-  #
-  def search?(request)
-    Array(request).join(' ') =~ search_regex
-  end
-
-  #
-  # @param [String,Array] request that is being evaluated as a search and playback 
-  #   request
-  # @return [Boolean]
-  #
-  def search_and_play?(request)
-    Array(request).join(' ') =~ /^play\b[^\b]+/
-  end
-  
   def show_more_regex
     /^show(?: me)? ?(\d+)? ?more(?: results)?$/
   end
@@ -130,46 +108,6 @@ class Robut::Plugin::Rdio
     Array(request).join(' ') =~ show_more_regex
   end
   
-  #
-  # @param [String,Array] request that is being evaluated as a show results
-  #   request
-  #
-  def show_results?(request)
-    Array(request).join(' ') =~ /^show(?: me)? ?all(?: results)?$/
-  end
-  
-  #
-  # @param [String,Array] request that is being evaluated as a command request
-  # @return [Boolean]
-  #
-  def command?(request)
-    Array(request).join(' ') =~ /^(?:play|(?:un)?pause|next|restart|back|clear)$/
-  end
-
-  #
-  # @param [String,Array] request that is being evaluated as a skip album request
-  # @return [Boolean]
-  #
-  def skip_album?(message)
-    message =~ /(next|skip) album/
-  end
-  
-  
-  def sender_nick
-    @sender_nick
-  end
-  
-  def sender_nick_short
-    @sender_nick.split(' ').first
-  end
-  
-  def message
-    @message
-  end
-  
-  def time
-    @time
-  end
   
   #
   # This method is called by Robut when a new message has been added to the 
@@ -180,54 +118,17 @@ class Robut::Plugin::Rdio
   # @param [String] message that the user has sent
   #
   def handle(time, sender_nick, message)
-    @time = time
-    @sender_nick = sender_nick
-    @message = message
     
     establish_server_callbacks!
     
     words = words(message)
     
-    if sent_to_me?(message)
-
-      if search_and_play?(words)
-        
-        search_and_play_criteria = words[1..-1].join(" ")
-        
-        unless search_and_play_result search_and_play_criteria
-          reply "I couldn't find '#{search_and_play_criteria}' on Rdio."
-        end
-        
-      elsif search?(words)
-        
-        find words.join(' ')[search_regex,-1]
-        save_results(@search_results)
-        reply_with_results_for_queueing
-        
-      elsif show_more?(words)
-        
-        show_more_results words.join(' ')[show_more_regex,-1]
-        save_results
-      
-      elsif show_results?(words)
-      
-        @search_results = results
-        reply_with_results_for_queueing
-      
-      elsif skip_album?(message)
-
-        send_server_command("next_album")
-
-      elsif command?(words)
-        
-        send_server_command(words.join("_"))
-        
-      end
+    # if sent_to_me?(message)
       
       meaningful_message = words.join(' ')
       actions.action_for(meaningful_message).handle(time,sender_nick,meaningful_message)
       
-    end
+    # end
     
   rescue => exception
     reply "#{exception} #{exception.backtrace}"
@@ -256,193 +157,35 @@ class Robut::Plugin::Rdio
   end
   
   def song_queue
-    @@queue = [] unless defined? @@queue
+    unless defined? @@queue
+      enqueue_lambda = lambda{|track_key| send_server_enqueue(track_key) }
+      @@queue = Queue.new enqueue_lambda
+    end
     @@queue
   end
   
   def save_song_queue(queue)
-    @@queue = [] unless defined? @@queue
-    @@queue.clear
-    Array(queue).each do |song|
-      @@queue << song
+    unless defined? @@queue
+      enqueue_lambda = lambda{|track_key| send_server_enqueue(track_key) }
+      @@queue = Queue.new enqueue_lambda
     end
-    
+    @@queue.update queue
   end
   
+  def rdio
+    @@rdio = ::Rdio.init(self.class.key, self.class.secret) unless defined? @@rdio
+    @@rdio
+  end
+  
+  
   private
+  
+  def send_server_enqueue(track_key)
+    Server.queue << track_key
+  end
 
   def send_server_command(command)
     Server.command << command
-  end
-
-  #
-  # @param [String] query the search criteria to use to find and then queue
-  #   up.
-  # 
-  def find(query_string)
-    query = QueryParser.parse query_string
-    query_type = query.type || default_type_of_query
-
-    reply "/me is searching for #{query.type.to_s[0] == 'a' ? 'an' : 'a'} #{query_type} with '#{query.terms}'..."
-    @search_results = search(query_string)
-  end
-  
-  def reply_with_results_for_queueing
-    reply "@#{sender_nick_short} I found the following:\n#{format_results_for_queueing(@search_results.results)}"
-  end
-  
-
-
-  def play_result(*requests)
-    
-    unless results
-      reply("I don't have any search results") and return
-    end
-    
-    requests = requests.flatten.compact
-    
-    # Queue all the songs when the request is 'all'
-    
-    if requests.first == "all"
-      queue(results.results) and return
-    end
-    
-    queue requests.flatten.map {|request| results[request] }.flatten
-    
-  end
-  
-  #
-  # @param [String] message the search criteria to use to find and then queue
-  #   up.
-  #
-  def search_and_play_result(query)
-    
-    search_results = search(query)
-    
-    if search_results and search_results.results
-      queue(search_results.results.first)
-      true
-    end
-    
-  end
-
-  #
-  # Enqueues the tracks specified and replies to the chatroom with the songs 
-  # that have been enqueued.
-  # 
-  # @param [Result,Results] results is a result or results that you want to 
-  #   enqueue.
-  #
-  def queue(results)
-    
-    # Queue the songs, while collecting, human-readable forms of the queued songs
-    
-    queued_songs = Array(results).map do |result|
-      Server.queue << result.key
-      format_result(result)
-    end
-    
-    # If the user has requested 2 songs then show those songs, 
-    # otherwise show the first song and the number of songs that were queued
-    
-    if queued_songs.length < 3
-      queued_songs.each {|song| reply "/me queued '#{song}'" }
-    else
-      reply "/me queued '#{queued_songs.first}' and #{queued_songs.length - 1} other songs"
-    end
-    
-  end
-  
-  #
-  # Formats the results for the purposes of displaying back to the user in an
-  # ordered list with prefix index to allow the user an easy way to later enqueue
-  # the tracks for playing.
-  # 
-  # @param [Result,Results] results a result or results that you want to display
-  #   with prefixed indexes.
-  #
-  def format_results_for_queueing(results,starting_index=0)
-    Array(results).each_with_index.map do |result, index|
-      "#{starting_index + index}: #{format_result(result)}"
-    end.join("\n")
-  end
-
-  #
-  # @param [Result] search_result an Rdio object that will be displayed
-  #
-  def format_result(search_result)
-    
-    unless defined? @@result_displayer and @@result_displayer
-      
-      @@result_displayer = {
-        ::Rdio::Album => lambda{|album| "#{album.artist.name} - #{album.name}"},
-        ::Rdio::Track => lambda{|track| "#{track.artist.name} - #{track.album.name} - #{track.name}"},
-        ::Rdio::Artist => lambda{|artist| "#{artist.name} - #{artist.tracks.sample.name}"}
-      }
-      
-      fallback_display = lambda{|object| object.to_s }
-      @@result_displayer.default fallback_display
-    
-    end
-    
-    @@result_displayer[search_result.class].call(search_result)
-  end
-  
-  #
-  # @param [String] query to search through the services to find the results
-  # @return [SearchResult] that is associated with the current user and contains
-  #   the set of results for the users's query.
-  # 
-  def search(query_string)
-    
-    # As this is only an rdio-plugin we will simply search Rdio and return the
-    # results from that search operation.
-    
-    query = QueryParser.parse query_string
-    query_type = query.type || default_type_of_query
-    
-    results = search_rdio query.terms, query_type.to_s.capitalize
-    
-    SearchResult.new sender_nick, results, query.terms, query_type.to_s.capitalize
-  end
-  
-  
-  def show_more_results(count)
-    count = count || default_result_count
-    
-    # append 'count' more results onto the existing result set
-    more_results = search_rdio(results.query,results.filters,results.length + 1,count)
-    
-    reply "@#{sender_nick_short} I found the following:\n#{format_results_for_queueing(more_results,results.length)}"
-    
-    results.append more_results
-  end
-  
-  #
-  # When a query does not contain a type of query it will default to this value
-  # for the user.
-  # 
-  def default_type_of_query
-    store["#{self.class.name}::query::type::#{sender_nick}"] || :track
-  end
-  
-  def default_result_count
-    store["#{self.class.name}::query::result_count::#{sender_nick}"] || 10
-  end
-    
-  # Searches Rdio for sources matching +words+. 
-  # 
-  # Given an array of Strings, which are the search terms, use Rdio to find any
-  # tracks that match. If the first word happens be `album` then search for
-  # albums that match the criteria.
-  #
-  #
-  # @param [String] query the query string
-  # @param [String] filters the areas to filter the data (i.e. Artist, Track, Album)
-  #
-  def search_rdio(query,filters,start=0,count=3)
-    api = ::Rdio.init(self.class.key, self.class.secret)
-    api.search(query,filters,nil,nil,start,count)
   end
 
 end
