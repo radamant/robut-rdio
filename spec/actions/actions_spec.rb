@@ -70,4 +70,39 @@ describe Actions do
     
   end
   
+  describe "#examples" do
+
+    context "when there are actions with examples" do
+
+      subject { Actions.new first_action, second_action }
+
+      let(:first_action) do 
+        action = double()
+        action.stub(:examples).and_return(expected_examples.first)
+        action
+      end
+      
+      let(:second_action) do
+        action = double()
+        action.stub(:examples).and_return(expected_examples[1..-1])
+        action
+      end
+
+      let(:expected_examples) do
+        [ 
+          "play <track> - plays this track", 
+          "play artist <artist>", 
+          "play album <album>"
+        ]
+        
+      end
+
+      it "should return an array of examples" do
+        subject.examples.should == expected_examples
+      end
+
+    end
+
+  end
+  
 end

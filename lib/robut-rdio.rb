@@ -92,7 +92,7 @@ class Robut::Plugin::Rdio
 
   # Returns a description of how to use this plugin
   def usage
-    # TODO: composed of all the action's examples
+    actions.examples
   end
 
   def show_more_regex

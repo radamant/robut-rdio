@@ -27,7 +27,11 @@ class Actions
   #   that action should handle the message
   #
   def action_for(message)
-    @actions.find {|action| action.match?(message) } || NoAction
+    Array(@actions).find {|action| action.match?(message) } || NoAction
+  end
+  
+  def examples
+    Array(@actions).map {|action| action.examples }.flatten
   end
   
 end
