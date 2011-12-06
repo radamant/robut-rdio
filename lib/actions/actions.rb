@@ -6,7 +6,7 @@ require_relative 'reply_action'
 # method with a specified message. Actions will always return an object that
 # responds with the #handle method even if that is a NoAction.
 # 
-class Actions
+class Robut::Plugin::Rdio::Actions
   
   #
   # Initialize with a list of actions. An action should repond to two
@@ -27,7 +27,7 @@ class Actions
   #   that action should handle the message
   #
   def action_for(message)
-    Array(@actions).find {|action| action.match?(message) } || NoAction
+    Array(@actions).find {|action| action.match?(message) } || Robut::Plugin::Rdio::NoAction
   end
   
   def examples

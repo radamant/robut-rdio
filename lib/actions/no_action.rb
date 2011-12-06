@@ -5,7 +5,7 @@
 # 
 # @see Actions#action_for
 # 
-module NoAction
+module Robut::Plugin::Rdio::NoAction
   extend self
   
   def handle(time,sender,message)

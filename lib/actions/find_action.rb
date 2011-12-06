@@ -8,8 +8,8 @@ require_relative '../search_result'
 # the Rdio interface that allows the encapsulation of the query becoming the 
 # search results.
 # 
-class FindAction
-  include ReplyAction
+class Robut::Plugin::Rdio::FindAction
+  include Robut::Plugin::Rdio::ReplyAction
   
   #
   # The FindActions requires the ability to output to the system what it is
@@ -41,7 +41,7 @@ class FindAction
   #   the set of results for the users's query.
   def find_results_for(sender,query_string)
     
-    query = QueryParser.parse query_string
+    query = Robut::Plugin::Rdio::QueryParser.parse query_string
     query_type = query.type || default_type_of_query
 
     reply "/me is searching for #{query.type.to_s[0] == 'a' ? 'an' : 'a'} #{query_type} with '#{query.terms}'..."

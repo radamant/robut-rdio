@@ -1,8 +1,8 @@
 require_relative 'reply_action'
 require_relative '../rdio_results_formatter'
 
-class ShowResultsAction
-  include ReplyAction
+class Robut::Plugin::Rdio::ShowResultsAction
+  include Robut::Plugin::Rdio::ReplyAction
 
   def initialize(reply,search_results)
     @reply = reply
@@ -61,7 +61,7 @@ class ShowResultsAction
   # @param [Result] search_result an Rdio object that will be displayed
   #
   def format_result(search_result)
-    RdioResultsFormatter.format_result search_result
+    Robut::Plugin::Rdio::RdioResultsFormatter.format_result search_result
   end
   
 end

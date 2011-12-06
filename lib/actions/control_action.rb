@@ -1,4 +1,7 @@
-class ControlAction
+#
+# Performs a command that is sent to the server.
+# 
+class Robut::Plugin::Rdio::ControlAction
   
   def initialize server_command_proc
     @server_command_proc = server_command_proc

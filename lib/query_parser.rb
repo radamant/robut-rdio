@@ -1,5 +1,5 @@
 
-module QueryParser
+module Robut::Plugin::Rdio::QueryParser
   extend self
   
   ParsedQuery = Struct.new :terms, :type

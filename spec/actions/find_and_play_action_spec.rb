@@ -1,10 +1,10 @@
 require_relative 'spec_helper'
 
-describe FindAndPlayAction do
+describe Robut::Plugin::Rdio::FindAndPlayAction do
   
   describe "#match?" do
 
-    subject { FindAndPlayAction.new nil, nil, nil }
+    subject { Robut::Plugin::Rdio::FindAndPlayAction.new nil, nil, nil }
     
 
     it_should_behave_like "a matching method"

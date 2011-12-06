@@ -1,8 +1,8 @@
 require_relative 'spec_helper'
 
-describe NoAction do
+describe Robut::Plugin::Rdio::NoAction do
   
-  subject { NoAction }
+  subject { Robut::Plugin::Rdio::NoAction }
   
   describe "#handle" do
 

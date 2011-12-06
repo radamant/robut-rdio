@@ -1,10 +1,10 @@
 require_relative 'spec_helper'
 
-describe ShowQueueAction do
+describe Robut::Plugin::Rdio::ShowQueueAction do
   
   describe "#examples" do
     
-    subject { ShowQueueAction.new nil, nil }
+    subject { Robut::Plugin::Rdio::ShowQueueAction.new nil, nil }
     
     it "should return a single example or list of examples" do
       examples = subject.examples
@@ -15,7 +15,7 @@ describe ShowQueueAction do
   
   describe "#match?" do
 
-    subject { ShowQueueAction.new nil, nil }
+    subject { Robut::Plugin::Rdio::ShowQueueAction.new nil, nil }
 
     it_should_behave_like "a matching method"
 
@@ -36,7 +36,7 @@ describe ShowQueueAction do
   
   describe "#handle" do
 
-    subject { ShowQueueAction.new nil, queue }
+    subject { Robut::Plugin::Rdio::ShowQueueAction.new nil, queue }
 
     let(:time) { Time.now }
     let(:sender) { "sender" }

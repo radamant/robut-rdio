@@ -1,4 +1,4 @@
-module RdioResultsFormatter
+module Robut::Plugin::Rdio::RdioResultsFormatter
   extend self
   
   def results_displayer

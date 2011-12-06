@@ -8,8 +8,8 @@ require_relative 'show_results_action'
 # them the ability to make a deicision about the results instead of playing
 # the first specified song.
 # 
-class FindAndShowResultsAction
-  include ReplyAction
+class Robut::Plugin::Rdio::FindAndShowResultsAction
+  include Robut::Plugin::Rdio::ReplyAction
   
   #
   # @see http://rubular.com/?regex=(find%7Cdo%20you%20have(%5Csany)%3F)%5Cs%3F(.%2B%5B%5E%3F%5D)%5C%3F%3F
@@ -25,8 +25,8 @@ class FindAndShowResultsAction
   # @param [Results] results object to store the search results
   #
   def initialize(reply,rdio,results)
-    @find_action = FindAction.new reply, rdio
-    @show_results_action = ShowResultsAction.new reply, results
+    @find_action = Robut::Plugin::Rdio::FindAction.new reply, rdio
+    @show_results_action = Robut::Plugin::Rdio::ShowResultsAction.new reply, results
     @results = results
   end
 

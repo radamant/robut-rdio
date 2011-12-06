@@ -1,10 +1,10 @@
 require_relative 'spec_helper'
 
-describe FindAction do
+describe Robut::Plugin::Rdio::FindAction do
   
   describe "#find_result_for" do
     
-    subject { FindAction.new nil, nil }
+    subject { Robut::Plugin::Rdio::FindAction.new nil, nil }
     
     let(:sender) { "sender" }
     

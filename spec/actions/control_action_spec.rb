@@ -1,10 +1,10 @@
 require_relative 'spec_helper'
 
-describe ControlAction do
+describe Robut::Plugin::Rdio::ControlAction do
   
   describe "#match?" do
 
-    subject { ControlAction.new nil }
+    subject { Robut::Plugin::Rdio::ControlAction.new nil }
     
     it_should_behave_like "a matching method"
     
@@ -35,7 +35,7 @@ describe ControlAction do
   
   describe "#handle" do
 
-    let(:subject) { ControlAction.new nil }
+    let(:subject) { Robut::Plugin::Rdio::ControlAction.new nil }
     
     let(:time) { Time.now }
     let(:sender) { "sender" }

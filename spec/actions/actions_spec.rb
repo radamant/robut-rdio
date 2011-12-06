@@ -1,6 +1,6 @@
 require_relative 'spec_helper'
 
-describe Actions do
+describe Robut::Plugin::Rdio::Actions do
   
   describe "#initialize" do
     
@@ -14,7 +14,7 @@ describe Actions do
     
     context "when given any number of parameters" do
       
-      subject { Actions.new :a, :b, :c }
+      subject { Robut::Plugin::Rdio::Actions.new :a, :b, :c }
 
       it "should create an instance" do
         subject.should be
@@ -31,14 +31,14 @@ describe Actions do
     context "when there are no actions" do
 
       it "should return NoAction" do
-        subject.action_for(message).should == NoAction
+        subject.action_for(message).should == Robut::Plugin::Rdio::NoAction
       end
 
     end
 
     context "when no actions match the message" do
       
-      subject { Actions.new example_action }
+      subject { Robut::Plugin::Rdio::Actions.new example_action }
       
       let(:example_action) do 
         non_matching_action = double()
@@ -47,14 +47,14 @@ describe Actions do
       end
       
       it "should return NoAction" do
-        subject.action_for(message).should == NoAction
+        subject.action_for(message).should == Robut::Plugin::Rdio::NoAction
       end
 
     end
     
     context "when an action matches the message" do
 
-      subject { Actions.new example_action }
+      subject { Robut::Plugin::Rdio::Actions.new example_action }
 
       let(:example_action) do 
         matching_action = double()
@@ -74,7 +74,7 @@ describe Actions do
 
     context "when there are actions with examples" do
 
-      subject { Actions.new first_action, second_action }
+      subject { Robut::Plugin::Rdio::Actions.new first_action, second_action }
 
       let(:first_action) do 
         action = double()

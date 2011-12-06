@@ -8,8 +8,8 @@ require_relative 'show_results_action'
 # the first 10 results do not contain all the tracks that the user wanted to
 # see.
 # 
-class FindMoreAndShowResultsAction
-  include ReplyAction
+class Robut::Plugin::Rdio::FindMoreAndShowResultsAction
+  include Robut::Plugin::Rdio::ReplyAction
   
   SHOW_MORE_RESULTS = /^show(?: me)? ?(\d+)? ?more(?: results)?$/
   

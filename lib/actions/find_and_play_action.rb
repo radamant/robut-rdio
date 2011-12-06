@@ -5,8 +5,8 @@ require_relative 'reply_action'
 # item in the search results without the review from the user. This action will 
 # not override the existing search results that a user has currently in the system.
 # 
-class FindAndPlayAction
-  include ReplyAction
+class Robut::Plugin::Rdio::FindAndPlayAction
+  include Robut::Plugin::Rdio::ReplyAction
   
   ACTION_REGEX = /^play\b([^\b]+)$/
   
@@ -22,7 +22,7 @@ class FindAndPlayAction
     @reply = reply
     @rdio = rdio
     @queue = queue
-    @find_action = FindAction.new @reply, @rdio
+    @find_action = Robut::Plugin::Rdio::FindAction.new @reply, @rdio
   end
   
   def examples

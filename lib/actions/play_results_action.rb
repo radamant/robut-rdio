@@ -4,8 +4,8 @@ require_relative '../rdio_results_formatter'
 #
 # 
 # 
-class PlayResultsAction
-  include ReplyAction
+class Robut::Plugin::Rdio::PlayResultsAction
+  include Robut::Plugin::Rdio::ReplyAction
   
   PLAY_REGEX = /^(?:play)?\s?(?:result)?\s?((?:\d[\s,-]*)+|all)$/
   

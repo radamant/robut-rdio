@@ -1,10 +1,10 @@
 require_relative 'spec_helper'
 
-describe PlayResultsAction do
+describe Robut::Plugin::Rdio::PlayResultsAction do
   
   describe "#examples" do
     
-    subject { PlayResultsAction.new nil, nil, nil }
+    subject { Robut::Plugin::Rdio::PlayResultsAction.new nil, nil, nil }
     
     it "should return a single example or list of examples" do
       examples = subject.examples
@@ -15,7 +15,7 @@ describe PlayResultsAction do
   
   describe "#match?" do
 
-    subject { PlayResultsAction.new nil, nil, nil }
+    subject { Robut::Plugin::Rdio::PlayResultsAction.new nil, nil, nil }
 
     it_should_behave_like "a matching method"
 
@@ -49,7 +49,7 @@ describe PlayResultsAction do
   
   describe "#parse_tracks_to_play" do
 
-    subject { PlayResultsAction.new nil, nil, nil }
+    subject { Robut::Plugin::Rdio::PlayResultsAction.new nil, nil, nil }
 
     context "when given tracks delimited by spaces or commas" do
 
@@ -85,7 +85,7 @@ describe PlayResultsAction do
   
   describe "#handle" do
 
-    subject { PlayResultsAction.new nil, nil, results }
+    subject { Robut::Plugin::Rdio::PlayResultsAction.new nil, nil, results }
 
     let(:results) { Hash.new }
 

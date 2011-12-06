@@ -3,7 +3,7 @@
 # and not reply.call on the lambda object that they are given when they
 # are created.
 # 
-module ReplyAction
+module Robut::Plugin::Rdio::ReplyAction
   
   def reply(message)
     @reply.call message

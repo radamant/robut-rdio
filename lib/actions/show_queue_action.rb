@@ -6,8 +6,8 @@ require_relative 'reply_action'
 # action will give insights into the state of the queue for users to allow
 # them to see music within the queue without having to visit the local website
 # 
-class ShowQueueAction
-  include ReplyAction
+class Robut::Plugin::Rdio::ShowQueueAction
+  include Robut::Plugin::Rdio::ReplyAction
   
   #
   # @param [Lambda] reply the lambda that can be called with a message
