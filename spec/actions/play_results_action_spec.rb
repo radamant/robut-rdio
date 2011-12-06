@@ -100,6 +100,7 @@ describe Robut::Plugin::Rdio::PlayResultsAction do
       it "should reply with the correct queue state" do
         
         subject.should_receive(:reply).with(expected_message)
+        subject.stub(:results_for).and_return([])
         subject.handle(time,sender,message)
         
       end

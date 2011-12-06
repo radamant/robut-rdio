@@ -138,26 +138,14 @@ class Robut::Plugin::Rdio
   # be available when someone makes another request.
   # 
   def results
-    @@results = {} unless defined? @@results
+    @@results = Robut::Plugin::Rdio::ResultsManager unless defined? @@results
     @@results
-  end
-  
-  #
-  # Store the current results for the user and set them as the last resultset
-  # so that users with expired results or no results with use someone else's
-  # results.
-  # 
-  def save_results(search_results)
-    @@results = {} unless defined? @@results
-    
-    @@results[search_results.owner] = search_results
-    @@results["LAST_RESULSET"] = search_results
   end
   
   def song_queue
     unless defined? @@queue
       enqueue_lambda = lambda{|track_key| send_server_enqueue(track_key) }
-      @@queue = Queue.new enqueue_lambda
+      @@queue = Robut::Plugin::Rdio::Queue.new enqueue_lambda
     end
     @@queue
   end
@@ -165,7 +153,7 @@ class Robut::Plugin::Rdio
   def save_song_queue(queue)
     unless defined? @@queue
       enqueue_lambda = lambda{|track_key| send_server_enqueue(track_key) }
-      @@queue = Queue.new enqueue_lambda
+      @@queue = Robut::Plugin::Rdio::Queue.new enqueue_lambda
     end
     @@queue.update queue
   end

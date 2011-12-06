@@ -49,25 +49,10 @@ class Robut::Plugin::Rdio::FindAndShowResultsAction
     
     search_results = @find_action.handle(time,sender,message[SEARCH_REGEX,-1])
     
-    save_results search_results
+    @results.save_results search_results
     
     @show_results_action.handle(time,sender,message)
     
-  end
-  
-  #
-  # Results are saved for both the owner of the search results and as the last
-  # saved search results.
-  # 
-  # @todo this Results needs to change as a structure to something that will
-  #   handle this logic.
-  # 
-  # @param [SearchResults] search_results are saved as the latest request that
-  #   is made and by owner of the search.
-  #
-  def save_results(search_results)
-    @results[search_results.owner] = search_results
-    @results["LAST_RESULSET"] = search_results
   end
 
 end

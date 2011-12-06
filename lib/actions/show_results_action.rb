@@ -19,28 +19,10 @@ class Robut::Plugin::Rdio::ShowResultsAction
   
   def handle(time,sender,message)
     
-    search_results = results_for sender, time
+    search_results = @search_results.results_for sender, time
     
     reply "@#{sender} I found the following:\n#{format_results_for_queueing(search_results.results)}"
     
-  end
-    
-  #
-  # @param [String] sender the result set for the specified sender.
-  # @param [Time] time the time of this request to use to find out if the 
-  #   results are too old to be used.
-  # 
-  # @return [SearchResult] the results for the sender if present and not
-  #   too old; defaults to the last result set for any user.
-  
-  def results_for(sender,time)
-    results_for_sender = @search_results[sender]
-    
-    if results_for_sender and results_for_sender.are_not_old?(time)
-      results_for_sender
-    else
-      @search_results["LAST_RESULSET"]
-    end
   end
 
   #
