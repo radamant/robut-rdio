@@ -8,12 +8,15 @@ Robut-rdio gives the ability for individuals within a [Hipchat](http://www.hipch
 
 * `find <ARTIST, ALBUM, TRACK>` - searches for the given term and returns a result set
 * `play <INDEX>` - play the track with the given index in the result set
+* `show results` - show the results again
+* `show <number> results` - find more results that will be added to the current result set
 * `pause` - pause the current playing song
-* `unpause` or `play` - will resume playing the current track
-* `next` will move to the next avaiable track
-* `back` will move to the previous track
-* `restart` will restart the current track over at the beginning
-* `clear` will remove all the currently enqueued songs
+* `unpause` or `play` - resume playing the current track
+* `next` - move to the next available track
+* `next album` - move to the next album within the queue
+* `back` - move to the previous track
+* `restart` - restart the current track over at the beginning
+* `clear` - remove all the currently enqueued songs
 
 #### `find` and `play`
 
