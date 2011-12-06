@@ -23,8 +23,8 @@ class Robut::Plugin::Rdio::FindMoreAndShowResultsAction
   #
   def initialize(reply,rdio,search_results)
     @reply = reply
-    @find_action = FindAction.new reply, rdio
-    @show_results_action = ShowResultsAction.new reply, search_results
+    @find_action = Robut::Plugin::Rdio::FindAction.new reply, rdio
+    @show_results_action = Robut::Plugin::Rdio::ShowResultsAction.new reply, search_results
     @search_results = search_results
   end
 

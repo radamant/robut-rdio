@@ -15,11 +15,11 @@ require_relative 'actions/show_results_action'
 require_relative 'actions/show_queue_action'
 require_relative 'actions/control_action'
 
-
 # A plugin that hooks into Rdio, allowing you to queue songs from
 # HipChat. +key+ and +secret+ must be set before we can deal with any
 # Rdio commands. Additionally, you must call +start_server+ in your
 # Chatfile to start the Rdio web server.
+# 
 class Robut::Plugin::Rdio
   include Robut::Plugin
 
@@ -78,13 +78,13 @@ class Robut::Plugin::Rdio
       reply_lambda = lambda{|message| reply(message, :room)}
       server_command_lambda = lambda{|command| send_server_command command }
       
-      @@actions = Actions.new PlayResultsAction.new(reply_lambda, song_queue, results),
-        FindAndPlayAction.new(reply_lambda, rdio, song_queue),
-        FindAndShowResultsAction.new(reply_lambda, rdio, results),
-        FindMoreAndShowResultsAction.new(reply_lambda, rdio, results),
-        ShowResultsAction.new(reply_lambda, results),
-        ShowQueueAction.new(reply_lambda, song_queue),
-        ControlAction.new(server_command_lambda)
+      @@actions = Actions.new Robut::Plugin::Rdio::PlayResultsAction.new(reply_lambda, song_queue, results),
+        Robut::Plugin::Rdio::FindAndPlayAction.new(reply_lambda, rdio, song_queue),
+        Robut::Plugin::Rdio::FindAndShowResultsAction.new(reply_lambda, rdio, results),
+        Robut::Plugin::Rdio::FindMoreAndShowResultsAction.new(reply_lambda, rdio, results),
+        Robut::Plugin::Rdio::ShowResultsAction.new(reply_lambda, results),
+        Robut::Plugin::Rdio::ShowQueueAction.new(reply_lambda, song_queue),
+        Robut::Plugin::Rdio::ControlAction.new(server_command_lambda)
     end
     
     @@actions
