@@ -21,7 +21,7 @@ class Robut::Plugin::Rdio::ShowResultsAction
     
     search_results = @search_results.results_for sender, time
     
-    reply "@#{sender} I found the following:\n#{format_results_for_queueing(search_results.results)}"
+    reply "@#{sender.split(' ').first} I found the following:\n#{format_results_for_queueing(search_results.results)}"
     
   end
 
