@@ -3,6 +3,7 @@ require_relative 'server/server'
 require 'rdio'
 
 require_relative 'queue'
+require_relative 'results_manager'
 require_relative 'search_result'
 require_relative 'query_parser'
 require_relative 'actions/actions'
