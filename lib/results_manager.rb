@@ -27,8 +27,8 @@ class Robut::Plugin::Rdio::ResultsManager
   # @param [SearchResults] results that are being saved
   #
   def save_results(results)
-    @results[search_results.owner] = search_results
-    @results["LAST_RESULSET"] = search_results
+    @results[results.owner] = results
+    @results["LAST_RESULSET"] = results
   end
   
   
