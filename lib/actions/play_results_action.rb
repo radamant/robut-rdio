@@ -104,7 +104,7 @@ class Robut::Plugin::Rdio::PlayResultsAction
   #
   def display_enqueued_tracks(tracks)
      
-    tracks = tracks.map {|track| RdioResultsFormatter.format_result(track) }
+    tracks = tracks.map {|track| Robut::Plugin::Rdio::RdioResultsFormatter.format_result(track) }
 
     if tracks.length < 3
       tracks.each {|song| reply "/me queued '#{song}'" }
