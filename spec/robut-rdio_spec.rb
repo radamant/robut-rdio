@@ -10,11 +10,7 @@ describe Robut::Plugin::Rdio do
     Robut::Plugin::Rdio.new connection 
   }
   
-  let(:sender) { "sender" }
-  
   let!(:store) { {} }
-  
-  let(:time) { Time.now }
   
   describe "#usage" do
     
@@ -57,7 +53,6 @@ describe Robut::Plugin::Rdio do
     it "should establish the server callbacks" do
       subject.should_receive(:establish_server_callbacks!)
       subject.handle(time,sender,message)
-      
     end
 
     context "when the message is sent to the plugin" do
@@ -65,11 +60,16 @@ describe Robut::Plugin::Rdio do
       let(:message) { "@dj meaningful part of the message" }
       
       let(:meaningful_message) { "meaningful part of the message" }
-      
 
+      let(:action) do
+        action = double()
+        action.stub(:handle)
+        action
+      end
+      
       let(:actions) do
         actions = double()
-        actions.should_receive(:action_for).with(meaningful_message)
+        actions.should_receive(:action_for).with(meaningful_message).and_return(action)
         actions
       end
 
