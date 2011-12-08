@@ -4,24 +4,63 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{robut-rdio}
-  s.version = "0.1.0"
+  s.name = "robut-rdio"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = [%q{Adam Pearson}]
-  s.date = %q{2011-11-25}
-  s.description = %q{}
-  s.email = %q{ampearson@gmail.com}
+  s.authors = ["Adam Pearson"]
+  s.date = "2011-12-08"
+  s.description = ""
+  s.email = "ampearson@gmail.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
   ]
-  s.files = `git ls-files`.split("\n") 
-  s.homepage = %q{http://github.com/radamant/robut-rdio}
-  s.licenses = [%q{MIT}]
-  s.require_paths = [%q{lib}]
-  s.rubygems_version = %q{1.8.6}
-  s.summary = %q{An RDIO client/server plugin for Robut}
+  s.files = [
+    ".document",
+    ".rspec",
+    ".rvmrc",
+    "CHANGELOG.md",
+    "Gemfile",
+    "Gemfile.lock",
+    "Guardfile",
+    "LICENSE.txt",
+    "README.md",
+    "Rakefile",
+    "VERSION",
+    "lib/robut-rdio.rb",
+    "lib/server/public/css/rdio.css",
+    "lib/server/public/css/style.css",
+    "lib/server/public/css/style_after.css",
+    "lib/server/public/images/background.png",
+    "lib/server/public/images/buffering.png",
+    "lib/server/public/images/circle-east.png",
+    "lib/server/public/images/circle-pause.png",
+    "lib/server/public/images/circle-play.png",
+    "lib/server/public/images/circle-stop.png",
+    "lib/server/public/images/disconnected.png",
+    "lib/server/public/images/no-album.png",
+    "lib/server/public/index.html",
+    "lib/server/public/js/libs/dd_belatedpng.js",
+    "lib/server/public/js/libs/jquery-1.5.1.min.js",
+    "lib/server/public/js/libs/modernizr-1.7.min.js",
+    "lib/server/public/js/rdio.js",
+    "lib/server/public/js/script.js",
+    "lib/server/server.rb",
+    "lib/tasks/shell.rake",
+    "plugin-tester.rb",
+    "robut-rdio.gemspec",
+    "spec/integration/robut-rdio_spec.rb",
+    "spec/robut-rdio_spec.rb",
+    "spec/server_spec.rb",
+    "spec/spec_helper.rb",
+    "spec/support/shared_examples.rb"
+  ]
+  s.homepage = "http://github.com/radamant/robut-rdio"
+  s.licenses = ["MIT"]
+  s.require_paths = ["lib"]
+  s.rubygems_version = "1.8.10"
+  s.summary = "An RDIO client/server plugin for Robut"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
@@ -31,32 +70,41 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<rdio>, ["= 0.0.91"])
       s.add_runtime_dependency(%q<sinatra>, [">= 0"])
       s.add_runtime_dependency(%q<thin>, [">= 0"])
-      s.add_development_dependency(%q<rspec>, ["~> 2.3.0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
       s.add_development_dependency(%q<highline>, [">= 0"])
+      s.add_development_dependency(%q<guard>, [">= 0"])
+      s.add_development_dependency(%q<guard-rspec>, [">= 0"])
+      s.add_development_dependency(%q<ruby-debug19>, [">= 0"])
     else
       s.add_dependency(%q<robut>, [">= 0"])
       s.add_dependency(%q<rdio>, ["= 0.0.91"])
       s.add_dependency(%q<sinatra>, [">= 0"])
       s.add_dependency(%q<thin>, [">= 0"])
-      s.add_dependency(%q<rspec>, ["~> 2.3.0"])
+      s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
       s.add_dependency(%q<rcov>, [">= 0"])
       s.add_dependency(%q<highline>, [">= 0"])
+      s.add_dependency(%q<guard>, [">= 0"])
+      s.add_dependency(%q<guard-rspec>, [">= 0"])
+      s.add_dependency(%q<ruby-debug19>, [">= 0"])
     end
   else
     s.add_dependency(%q<robut>, [">= 0"])
     s.add_dependency(%q<rdio>, ["= 0.0.91"])
     s.add_dependency(%q<sinatra>, [">= 0"])
     s.add_dependency(%q<thin>, [">= 0"])
-    s.add_dependency(%q<rspec>, ["~> 2.3.0"])
+    s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
     s.add_dependency(%q<rcov>, [">= 0"])
     s.add_dependency(%q<highline>, [">= 0"])
+    s.add_dependency(%q<guard>, [">= 0"])
+    s.add_dependency(%q<guard-rspec>, [">= 0"])
+    s.add_dependency(%q<ruby-debug19>, [">= 0"])
   end
 end
 
