@@ -38,7 +38,7 @@ describe Robut::Plugin::Rdio::Actions do
 
     context "when no actions match the message" do
       
-      subject { Robut::Plugin::Rdio::Actions.new example_action }
+      subject { Robut::Plugin::Rdio::Actions.new(example_action).action_for(message) }
       
       let(:example_action) do 
         non_matching_action = double()
@@ -46,15 +46,13 @@ describe Robut::Plugin::Rdio::Actions do
         non_matching_action
       end
       
-      it "should return NoAction" do
-        subject.action_for(message).should == Robut::Plugin::Rdio::NoAction
-      end
+      it { should == Robut::Plugin::Rdio::NoAction }
 
     end
     
     context "when an action matches the message" do
 
-      subject { Robut::Plugin::Rdio::Actions.new example_action }
+      subject { Robut::Plugin::Rdio::Actions.new(example_action).action_for(message) }
 
       let(:example_action) do 
         matching_action = double()
@@ -62,9 +60,7 @@ describe Robut::Plugin::Rdio::Actions do
         matching_action
       end
 
-      it "should return that action" do
-        subject.action_for(message).should == example_action
-      end
+      it { should == example_action }
 
     end
     
@@ -74,7 +70,7 @@ describe Robut::Plugin::Rdio::Actions do
 
     context "when there are actions with examples" do
 
-      subject { Robut::Plugin::Rdio::Actions.new first_action, second_action }
+      subject { Robut::Plugin::Rdio::Actions.new(first_action, second_action).examples }
 
       let(:first_action) do 
         action = double()
@@ -96,10 +92,8 @@ describe Robut::Plugin::Rdio::Actions do
         ]
         
       end
-
-      it "should return an array of examples" do
-        subject.examples.should == expected_examples
-      end
+      
+      it { should == expected_examples }
 
     end
 
