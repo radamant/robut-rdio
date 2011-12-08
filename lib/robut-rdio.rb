@@ -95,19 +95,6 @@ class Robut::Plugin::Rdio
   def usage
     actions.examples
   end
-
-  def show_more_regex
-    /^show(?: me)? ?(\d+)? ?more(?: results)?$/
-  end
-  
-  #
-  # @param [String,Array] request that is being evaluated as a show more results
-  #   request.
-  # @return [Boolean]
-  #
-  def show_more?(request)
-    Array(request).join(' ') =~ show_more_regex
-  end
   
   
   #
@@ -139,7 +126,7 @@ class Robut::Plugin::Rdio
   # be available when someone makes another request.
   # 
   def results
-    @@results = Robut::Plugin::Rdio::ResultsManager unless defined? @@results
+    @@results = Robut::Plugin::Rdio::ResultsManager.new unless defined? @@results
     @@results
   end
   
