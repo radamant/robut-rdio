@@ -32,7 +32,7 @@ GEM
       rack
     rack-test (0.6.1)
       rack (>= 1.0)
-    rake (0.9.2.2)
+    rake (13.0.1)
     rcov (0.9.11)
     rdio (0.0.91)
       oauth (>= 0.3.0)
